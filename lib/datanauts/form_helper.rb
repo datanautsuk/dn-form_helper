@@ -70,9 +70,11 @@ module Datanauts
 
       tabindex = options.delete(:tab)
       tabindex = -1 if tabindex === false
+      input_options = options.delete(:input_options) || {}
+      input_classes = ['form-control'] << input_options.delete(:class)
       input_options = {
         :id => input_id,
-        :class => "form-control",
+        :class => input_classes.compact.join(' '),
         :type => options.delete(:type) || 'text',
         :name => input_name,
         :tabindex => tabindex,
@@ -80,7 +82,8 @@ module Datanauts
         :value => options.delete(:value) || val,
         :style => options.delete(:style),
         :autocomplete => options.delete(:autocomplete)
-      }.merge(options.delete(:input_options) || {})
+      }.merge(input_options)
+      
 
       if options.delete(:no_wrap)
         :input.tag(input_options)
@@ -123,24 +126,37 @@ module Datanauts
         :tabindex => tabindex,
       }.merge(options.delete(:input_options) || {})
 
-      selected = object.send(name) rescue nil
+ 
+      selected = object.send(name)
       selected = options.delete(:selected) || selected
+      
+      options[:options] = options[:options].to_a if options[:options].is_a? Hash
 
-      options[:options] = options_for_select(options[:options], { :value_field => options.delete(:options_id), :text_field => options.delete(:options_name)}) unless options[:options].is_a? Array
+      unless options[:options].is_a? Array
+        options[:options] = options_for_select(options[:options], { 
+          :value_field => options.delete(:options_id),
+          :text_field => options.delete(:options_name)
+        })
+      end
+      
       option_attributes = options.delete(:option_attributes) || {}
 
       select_html = :select.wrap(select_options) do
         options_html += options.delete(:options).inject("") do |s, op|
+          # binding.pry; 
           val, text = op.is_a?(Array) ? [ op[0], op[1] ] : [op, op.humanize]
           option_attr = option_attributes.inject({}) { |h,p| h[p[0]] = p[1][val]; h }
-          s += :option.wrap({ :value => val, :selected => ('selected' if selected == val && val) }.merge(option_attr)) { text }
+          s += :option.wrap({ 
+            :value => val, 
+            :selected => ('selected' if val && selected.to_s == val.to_s)
+          }.merge(option_attr)) { text }
         end
       end
 
       if options.delete(:no_wrap)
         select_html
       else
-        field_for object, name, select_html, options.merge({:input_id => select_id})
+        field_for object, name, select_html, options
       end
     end
 
@@ -253,7 +269,6 @@ module Datanauts
       required_fields = o.errors.keys
 
       err = (object.errors[name] || nil)
-      # binding.pry; 
       has_error = !err.nil? && ![*err].empty?
       
       option_classes = (options[:class] || "").split(' ') 

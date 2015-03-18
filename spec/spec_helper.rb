@@ -2,6 +2,10 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'datanauts/form_helper'
 require 'pry'
 
+RSpec.configure do |config|
+  config.include Datanauts::FormHelper
+end
+
 module Datanauts::FormHelper
   def capture_haml(*args, &block)
     yield args.first
@@ -37,7 +41,7 @@ class User
     @errors ||= begin
       errors = {}
       @required_fields.each do |f|
-        errors[f] = 'is missing' unless @attrs[f]
+        errors[f] = 'is missing' unless @attrs[f] || (self.respond_to?(f.to_sym) && self.send(f.to_sym))
       end
       
       FakeErrors.new(errors)
