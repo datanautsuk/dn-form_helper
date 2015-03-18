@@ -25,7 +25,7 @@ class User
   
   def initialize(attrs = {})
     @attrs = attrs
-    @required_fields = [:first_name, :last_name, :email]
+    @required_fields = [:email]
   end
   
   def valid?
@@ -48,8 +48,10 @@ class User
     @attrs.length == 0
   end
   
-  def method_missing(meth, *args)
-    @attrs[meth.to_sym] || super
+  def method_missing(method, *args)
+    super unless @attrs.member? method.to_sym
+    
+    @attrs[method.to_sym]
   end
   
 end

@@ -284,7 +284,7 @@ module Datanauts
       if has_error
         hint += :div.wrap(:class => "help-block error") { err.join(', ') }
         option_classes << 'has-error'
-        options[:title] = err.join(', ')
+        # options[:title] = err.join(', ')
       else
         err  = ""
       end
