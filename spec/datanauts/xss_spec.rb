@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'active_support/core_ext/string/output_safety'
 
 describe 'XSS protection' do
   before do
@@ -15,8 +14,8 @@ describe 'XSS protection' do
     end
     
     it 'returns html_safe strings' do
-      f = input(@user, :first_name)
-      expect(f).to be_html_safe
+      f = input(@user, :first_name, :hint => 'this is a hint')
+      expect(f + "not safe!").to be_html_safe
     end
     
   end
@@ -29,6 +28,13 @@ describe 'XSS protection' do
       expect(f).to include '&lt;script&gt;'
     end
     
+  end
+  
+  describe 'form_for' do
+    it 'should be html safe' do
+      f = form_for(@user) {"<p>abc def</p>"}
+      expect(f).to be_html_safe
+    end    
   end
   
 end

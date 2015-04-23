@@ -14,21 +14,22 @@ module Datanauts
 
       raise ArgumentError, "Missing block" unless block_given?
 
-      # object, parent_object = [*object]
-      # if parent_object
-      #   prefix = "/#{parent_object.class.to_s.underscore.pluralize}/#{parent_object.id}"
-      # else
-      #   prefix = ""
-      # end
+      object, parent_object = [*object]
+      prefix = if parent_object
+        "/#{parent_object.class.to_s.underscore.pluralize}/#{parent_object.id}"
+      else
+        ""
+      end
 
       opts = { :method => :post }
-      mfield = ""
+
+      mfield = object.new? ? '' : :input.tag(:type => 'hidden', :name => '_method', :value => 'put')
+
       if (options[:action].nil? || options[:action] == '') && defined?(request)
         if object.new?
           opts[:action] = request.script_name.gsub(/\/$/, '') + prefix + "/#{object.class.to_s.underscore}s"
         else
           opts[:action] = request.script_name.gsub(/\/$/, '') + prefix + "/#{object.class.to_s.underscore}s/#{object.pk}"
-          mfield = :input.tag(:type => 'hidden', :name => '_method', :value => 'put')
         end
       end
 
@@ -221,12 +222,59 @@ module Datanauts
 
       o = {:type => "checkbox", :name => checkbox_name, :id => "#{checkbox_id}_true", :value => 1}
       o.update({:checked => "checked"}) if val || options[:checked] == "checked"
-      
-      checkbox_html += :label.wrap { :input.tag(o) + options.delete(:label) || name.to_s.humanize.titleize }
+
+      checkbox_html += :label.wrap { :input.tag(o) + (options.delete(:label) || name.to_s.humanize.titleize) }
 
       options[:class] ||= 'checkbox'
 
       field_for object, name, checkbox_html, options.merge({:label => false})
+    end
+    
+    def checkbox_group(object, name, options = {})
+      checkbox_id = "#{object.class.to_s}_#{name}".underscore
+      checkbox_name = "#{object.class.to_s.underscore}[#{name}][]"
+
+      div_options = {}.merge(options.delete(:div_options) || {})
+      checkbox_options = {}.merge(options.delete(:input_options) || {})
+      
+      value_options = options.delete(:value_options) || {}
+      
+      checkboxes_html = options.delete(:options).inject("") do |s, op|
+
+        if op.is_a? Array
+          val = op[0]
+          label = op[1]
+        else
+          val, label = op
+        end
+
+        label ||= val
+        selected_attr = {}
+        selected = options.delete(:selected)
+
+        if object.send(name) == val
+          selected_attr = {:checked => "checked"}
+        elsif object.send(name).is_a?(Array) && object.send(name).include?(val)
+          selected_attr = {:checked => "checked"}
+        elsif object.send(name).nil? && selected == val
+          selected_attr = {:checked => "checked"}
+        end
+        
+        value_options[val] = {} unless value_options[val].is_a?(Hash)
+
+        s += :div.wrap({:class => "checkbox"}.merge(div_options)) do
+          :label.wrap do
+            :input.tag({:type => "checkbox", :name => checkbox_name, :id => "#{checkbox_id}_#{op}", :value => val }.merge(selected_attr).merge(checkbox_options).merge(value_options[val])) + label
+          end
+        end
+      end.html_safe
+
+      if options.delete(:no_wrap)
+        checkboxes_html
+      else
+        field_for object, name, checkboxes_html, options
+      end
+
     end
 
     #  ============
@@ -306,7 +354,7 @@ module Datanauts
       end
 
       if has_error
-        hint += :div.wrap(:class => "help-block error") { err.join(', ') }
+        hint += :div.wrap(:class => "help-block error") { err.join(', ').html_safe }
         option_classes << 'has-error'
       else
         err = "".html_safe

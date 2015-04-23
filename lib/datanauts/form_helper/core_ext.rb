@@ -40,8 +40,14 @@ class String
   end
   alias_method :titlecase, :titleize
   
-  def html_safe
-    self
-  end unless instance_methods.include? :html_safe
+  # def html_safe
+  #   self
+  # end unless instance_methods.include? :html_safe
+
+  # def html_safe?
+  #   super rescue true
+  # end 
+  # unless instance_methods.include? "html_safe?".to_sym
   
+
 end

@@ -1,6 +1,7 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'datanauts/form_helper'
 require 'pry'
+require 'active_support/core_ext/string/output_safety'
 
 RSpec.configure do |config|
   config.include Datanauts::FormHelper
@@ -48,6 +49,10 @@ class User
     end    
   end
   
+  def pk
+    @attrs[:id] || 1
+  end
+  
   def new?
     @attrs.length == 0
   end
@@ -85,3 +90,12 @@ class FakeErrors
     @errors.empty?
   end
 end
+
+class String
+  
+  def no_white_space
+    gsub(/\s*\n\s*/, "").chomp
+  end
+  
+end
+
