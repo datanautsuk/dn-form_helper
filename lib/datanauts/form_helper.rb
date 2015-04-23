@@ -1,6 +1,7 @@
 require "datanauts/form_helper/version"
 require "datanauts/form_helper/core_ext"
 require 'bigdecimal'
+require 'rack/utils'
 
 module Datanauts
   module FormHelper
@@ -48,6 +49,8 @@ module Datanauts
 
       # get object value
       val = object.send(name) rescue nil
+      
+      
       if val.is_a? BigDecimal
         # if the field appears to be for currency, format it to 2 decimal places.
         if options[:type] == :currency
@@ -58,6 +61,8 @@ module Datanauts
       end
 
       val = val.join(",") if val.is_a? Array
+      val = options.delete(:value) || val
+      val = Rack::Utils.escape_html(val) if val.is_a? String
 
       if options[:type].to_s == 'hidden'
         options[:label] = false
@@ -72,6 +77,9 @@ module Datanauts
       tabindex = -1 if tabindex === false
       input_options = options.delete(:input_options) || {}
       input_classes = ['form-control'] << input_options.delete(:class)
+      
+      
+      
       input_options = {
         :id => input_id,
         :class => input_classes.compact.join(' '),
@@ -79,7 +87,7 @@ module Datanauts
         :name => input_name,
         :tabindex => tabindex,
         :placeholder => options.delete(:placeholder),
-        :value => options.delete(:value) || val,
+        :value => val,
         :style => options.delete(:style),
         :autocomplete => options.delete(:autocomplete)
       }.merge(input_options)
@@ -143,14 +151,13 @@ module Datanauts
 
       select_html = :select.wrap(select_options) do
         options_html += options.delete(:options).inject("") do |s, op|
-          # binding.pry; 
           val, text = op.is_a?(Array) ? [ op[0], op[1] ] : [op, op.humanize]
           option_attr = option_attributes.inject({}) { |h,p| h[p[0]] = p[1][val]; h }
           s += :option.wrap({ 
             :value => val, 
             :selected => ('selected' if val && selected.to_s == val.to_s)
           }.merge(option_attr)) { text }
-        end
+        end.html_safe
       end
 
       if options.delete(:no_wrap)
@@ -242,6 +249,8 @@ module Datanauts
         :cols => options.delete(:cols),
         :tabindex => tabindex,
       }.merge(options.delete(:input_options) || {})
+      
+      val = Rack::Utils.escape_html(val) if val.is_a? String
 
       textarea_html = :textarea.wrap(textarea_options) { val }
 
@@ -293,15 +302,14 @@ module Datanauts
       if hint = options.delete(:hint)
         hint = :div.wrap(:class => 'help-block') { hint }
       else
-        hint = ""
+        hint = "".html_safe
       end
 
       if has_error
         hint += :div.wrap(:class => "help-block error") { err.join(', ') }
         option_classes << 'has-error'
-        # options[:title] = err.join(', ')
       else
-        err  = ""
+        err = "".html_safe
       end
 
       field_input = input_html + hint.to_s
