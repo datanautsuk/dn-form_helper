@@ -239,7 +239,9 @@ module Datanauts
       
       value_options = options.delete(:value_options) || {}
       
-      checkboxes_html = options.delete(:options).inject("") do |s, op|
+      checkboxes_html = :input.tag(:type => "hidden", :name => checkbox_name, :id => "#{checkbox_id}_empty")
+
+      checkboxes_html += options.delete(:options).inject("") do |s, op|
 
         if op.is_a? Array
           val = op[0]
@@ -264,10 +266,11 @@ module Datanauts
 
         s += :div.wrap({:class => "checkbox"}.merge(div_options)) do
           :label.wrap do
-            :input.tag({:type => "checkbox", :name => checkbox_name, :id => "#{checkbox_id}_#{op}", :value => val }.merge(selected_attr).merge(checkbox_options).merge(value_options[val])) + label
+            :input.tag({:type => "checkbox", :name => checkbox_name, :id => "#{checkbox_id}_#{val}", :value => val }.merge(selected_attr).merge(checkbox_options).merge(value_options[val])) + label
           end
         end
       end.html_safe
+      
 
       if options.delete(:no_wrap)
         checkboxes_html

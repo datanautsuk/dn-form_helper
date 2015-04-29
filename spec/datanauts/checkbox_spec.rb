@@ -34,10 +34,11 @@ describe 'Datanauts::FormHelper#checkbox' do
       f = checkbox_group(@user, :preferences, :options => prefs)
       # puts f
       expect(f.no_white_space).to eql '<div class="form-group"><label class="control-label" for="user_preferences">Preferences</label>
-          <div class="checkbox"><label><input type="checkbox" name="user[preferences][]" id="user_preferences_[:foo, "Some Foo"]" value="foo" />Some Foo</label></div>
-          <div class="checkbox"><label><input type="checkbox" name="user[preferences][]" id="user_preferences_[:bar, "Some Bar"]" value="bar" />Some Bar</label></div>
-          <div class="checkbox"><label><input type="checkbox" name="user[preferences][]" id="user_preferences_[:baz, "Some Baz"]" value="baz" />Some Baz</label></div>
-          <div class="checkbox"><label><input type="checkbox" name="user[preferences][]" id="user_preferences_[:fiz, "Some Fizz"]" value="fiz" />Some Fizz</label></div>
+          <input type="hidden" name="user[preferences][]" id="user_preferences_empty" />
+          <div class="checkbox"><label><input type="checkbox" name="user[preferences][]" id="user_preferences_foo" value="foo" />Some Foo</label></div>
+          <div class="checkbox"><label><input type="checkbox" name="user[preferences][]" id="user_preferences_bar" value="bar" />Some Bar</label></div>
+          <div class="checkbox"><label><input type="checkbox" name="user[preferences][]" id="user_preferences_baz" value="baz" />Some Baz</label></div>
+          <div class="checkbox"><label><input type="checkbox" name="user[preferences][]" id="user_preferences_fiz" value="fiz" />Some Fizz</label></div>
           </div>'.no_white_space
     end
     
