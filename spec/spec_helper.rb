@@ -97,5 +97,9 @@ class String
     gsub(/\s*\n\s*/, "").chomp
   end
   
+  def inspect
+    self
+  end
+  
 end
 
