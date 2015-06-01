@@ -195,7 +195,7 @@ module Datanauts
             :input.tag({:type => "radio", :name => radio_name, :id => "#{radio_id}_#{op[0]}", :value => op[0] }.merge(selected_attr)) + label
           end
         end
-      end
+      end.html_safe
 
       if options.delete(:no_wrap)
         radios_html
