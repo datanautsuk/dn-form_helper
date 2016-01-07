@@ -10,6 +10,10 @@ module Datanauts::FormHelper
   def capture_haml(*args, &block)
     yield args.first
   end
+  
+  def session
+    {}
+  end
 end
 
 # def fake_model(name = 'model', errors_list = {})

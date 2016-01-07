@@ -23,7 +23,8 @@ module Datanauts
 
       opts = { :method => :post }
 
-      mfield = object.new? ? '' : :input.tag(:type => 'hidden', :name => '_method', :value => 'put')
+      mfield = object.new? ? '' : :input.tag(:type => 'hidden', :name => '_method', :value => 'put')      
+      csrf_field = (session && session[:csrf]) ? :input.tag(:type => 'hidden', :name => 'authenticity_token', :value => session[:csrf]) : ''
 
       if (options[:action].nil? || options[:action] == '') && defined?(request)
         if object.new?
@@ -35,7 +36,7 @@ module Datanauts
 
       options[:enctype] = 'multipart/form-data' if options.delete(:file)
 
-      :form.wrap(opts.merge(options)) { mfield + capture_haml( FormModel.new(self, object), &block ) }
+      :form.wrap(opts.merge(options)) { mfield + csrf_field+ capture_haml( FormModel.new(self, object), &block ) }
 
     end
 
