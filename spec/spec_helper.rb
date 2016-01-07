@@ -1,7 +1,6 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'datanauts/form_helper'
 require 'pry'
-require 'active_support/core_ext/string/output_safety'
 
 RSpec.configure do |config|
   config.include Datanauts::FormHelper

@@ -26,7 +26,6 @@ describe 'Datanauts::FormHelper#checkbox' do
         Super User?
         </label>
         </div>'.no_white_space
-      expect(f).to be_html_safe
     end
 
     it 'renders a group of checkboxes with some options checked' do

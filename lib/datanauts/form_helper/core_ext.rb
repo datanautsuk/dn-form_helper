@@ -3,7 +3,7 @@ class Symbol
   # :input.tag :name => 'address', :value => 'Foo Road'
   def tag(options={})
     option_string = (' ' + options.to_html_options).sub(/\s+$/, '')
-    "<#{self.to_s}#{option_string} />".html_safe
+    "<#{self.to_s}#{option_string} />"
   end
 
   # :div.wrap "Hello", :id => "userbox", :class => "box"
@@ -15,13 +15,13 @@ class Symbol
     (options = content; content = nil) if content.is_a? Hash
     content = yield || content if block
     option_string = (' ' + options.to_html_options).sub(/\s+$/, '')
-    "<#{self.to_s}#{option_string}>#{content.to_s}</#{self.to_s}>\n".html_safe
+    "<#{self.to_s}#{option_string}>#{content.to_s}</#{self.to_s}>\n"
   end
 end
 
 class Hash
   def to_html_options
-    (self.map{|key, value| %(#{key.to_s}="#{value.to_s}") if value } - [nil]).join(" ").html_safe
+    (self.map{|key, value| %(#{key.to_s}="#{value.to_s}") if value } - [nil]).join(" ")
   end
 end
 

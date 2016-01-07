@@ -158,7 +158,7 @@ module Datanauts
             :value => val, 
             :selected => ('selected' if val && selected.to_s == val.to_s)
           }.merge(option_attr)) { text }
-        end.html_safe
+        end
       end
 
       if options.delete(:no_wrap)
@@ -195,7 +195,7 @@ module Datanauts
             :input.tag({:type => "radio", :name => radio_name, :id => "#{radio_id}_#{op[0]}", :value => op[0] }.merge(selected_attr)) + label
           end
         end
-      end.html_safe
+      end
 
       if options.delete(:no_wrap)
         radios_html
@@ -269,7 +269,7 @@ module Datanauts
             :input.tag({:type => "checkbox", :name => checkbox_name, :id => "#{checkbox_id}_#{val}", :value => val }.merge(selected_attr).merge(checkbox_options).merge(value_options[val])) + label
           end
         end
-      end.html_safe
+      end
       
 
       if options.delete(:no_wrap)
@@ -353,14 +353,14 @@ module Datanauts
       if hint = options.delete(:hint)
         hint = :div.wrap(:class => 'help-block') { hint }
       else
-        hint = "".html_safe
+        hint = ""
       end
 
       if has_error
-        hint += :div.wrap(:class => "help-block error") { err.join(', ').html_safe }
+        hint += :div.wrap(:class => "help-block error") { err.join(', ') }
         option_classes << 'has-error'
       else
-        err = "".html_safe
+        err = ""
       end
 
       field_input = input_html + hint.to_s
