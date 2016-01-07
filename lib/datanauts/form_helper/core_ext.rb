@@ -15,7 +15,7 @@ class Symbol
     (options = content; content = nil) if content.is_a? Hash
     content = yield || content if block
     option_string = (' ' + options.to_html_options).sub(/\s+$/, '')
-    "<#{self.to_s}#{option_string}>#{content.to_s}</#{self.to_s}>\n"
+    "<#{self.to_s}#{option_string}>#{content.to_s}</#{self.to_s}>"
   end
 end
 
