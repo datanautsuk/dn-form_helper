@@ -101,7 +101,7 @@ module Datanauts
       if append = options.delete(:append)
         append = :div.wrap(:class => 'input-group-addon') { append }
       end
-      
+
       if prepend || append
         input_tag_html = :div.wrap(:class => 'input-group') { prepend.to_s + input_tag_html + append.to_s }
       end
@@ -172,6 +172,19 @@ module Datanauts
           }.merge(option_attr)) { text }
         end
       end
+
+      if prepend = options.delete(:prepend)
+        prepend = :div.wrap(:class => 'input-group-addon') { prepend }
+      end
+
+      if append = options.delete(:append)
+        append = :div.wrap(:class => 'input-group-addon') { append }
+      end
+
+      if prepend || append
+        select_html = :div.wrap(:class => 'input-group') { prepend.to_s + select_html + append.to_s }
+      end
+
 
       if options.delete(:no_wrap)
         select_html

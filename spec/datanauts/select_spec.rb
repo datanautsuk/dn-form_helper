@@ -67,4 +67,38 @@ describe 'Datanauts::FormHelper#select' do
     end
   end
   
+    context 'with addons' do
+
+    it 'adds addon to the beginning of the input' do
+
+     f = select(@user, :select_thing, :prepend => '£', :options => {:foo => "one", :bar => "two", :baz => "three"})
+
+      expect(f.chomp).to eql '<div class="form-group"><label for="user_select_thing">Select Thing</label>
+<div class="input-group"><div class="input-group-addon">£</div><select id="user_select_thing" class="form-control" name="user[select_thing]"><option value="">Choose</option>
+<option value="foo">one</option>
+<option value="bar">two</option>
+<option value="baz">three</option>
+</select></div>
+</div>'.no_white_space
+
+    end
+
+    it 'adds addon to the end of the input' do
+
+     f = select(@user, :select_thing, :append => '.00', :options => {:foo => "one", :bar => "two", :baz => "three"})
+
+     expect(f.chomp).to eql '<div class="form-group"><label for="user_select_thing">Select Thing</label>
+<div class="input-group"><select id="user_select_thing" class="form-control" name="user[select_thing]"><option value="">Choose</option>
+<option value="foo">one</option>
+<option value="bar">two</option>
+<option value="baz">three</option>
+</select><div class="input-group-addon">.00</div></div>
+</div>'.no_white_space
+
+    end
+
+
+      end
+
+  
 end
