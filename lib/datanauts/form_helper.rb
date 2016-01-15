@@ -357,20 +357,16 @@ module Datanauts
 
       end
 
-      if hint = options.delete(:hint)
-        hint = :div.wrap(:class => 'help-block') { hint }
-      else
-        hint = "".html_safe
-      end
+      hint = :div.wrap(:class => 'help-block') { options.delete(:hint).to_s.html_safe }
 
       if has_error
-        hint += :div.wrap(:class => "help-block error") { err.join(', ').html_safe }
         option_classes << 'has-error'
+        error_message = :div.wrap(:class => "help-block error") { err.join(', ').html_safe }
       else
-        err = "".html_safe
+        error_message = ''.html_safe
       end
 
-      field_input = input_html + hint.to_s
+      field_input = input_html + hint + error_message
 
       options[:class] = option_classes.join(' ')
 
