@@ -377,14 +377,14 @@ module Datanauts
         hint = ""
       end
 
-      if has_error
-        hint += :div.wrap(:class => "help-block error") { err.join(', ') }
+      error_message = if has_error
         option_classes << 'has-error'
+        :div.wrap(:class => "help-block error") { err.join(', ') }
       else
-        err = ""
+        ""
       end
 
-      field_input = input_html + hint.to_s
+      field_input = input_html + hint.to_s + error_message.to_s
 
       options[:class] = option_classes.join(' ')
 
