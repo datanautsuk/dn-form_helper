@@ -49,7 +49,7 @@ module Datanauts
       input_name = "#{object.class.to_s.underscore}[#{name}]"
 
       # get object value
-      val = object.send(name) rescue nil
+      val = options[:value] ||object.send(name) rescue nil
       
       
       if val.is_a? BigDecimal
