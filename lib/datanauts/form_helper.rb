@@ -50,7 +50,11 @@ module Datanauts
       input_name = "#{object.class.to_s.underscore}[#{name}]"
 
       # get object value
-      val = options[:value] || object.send(name) rescue nil
+      val = if options.key? :value
+        options[:value]
+      else
+        object.send(name) rescue nil
+      end
 
       if val.is_a? BigDecimal
         # if the field appears to be for currency, format it to 2 decimal places.
