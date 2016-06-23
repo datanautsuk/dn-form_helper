@@ -24,6 +24,7 @@ module Datanauts
       opts = { :method => :post }
 
       mfield = object.new? ? '' : :input.tag(:type => 'hidden', :name => '_method', :value => 'put')
+      csrf_field = (session && session[:csrf]) ? :input.tag(:type => 'hidden', :name => 'authenticity_token', :value => session[:csrf]) : ''
 
       if (options[:action].nil? || options[:action] == '') && defined?(request)
         if object.new?
@@ -35,7 +36,7 @@ module Datanauts
 
       options[:enctype] = 'multipart/form-data' if options.delete(:file)
 
-      :form.wrap(opts.merge(options)) { mfield + capture_haml( FormModel.new(self, object), &block ) }
+      :form.wrap(opts.merge(options)) { mfield + csrf_field+ capture_haml( FormModel.new(self, object), &block ) }
 
     end
 
@@ -49,9 +50,8 @@ module Datanauts
       input_name = "#{object.class.to_s.underscore}[#{name}]"
 
       # get object value
-      val = options[:value] ||object.send(name) rescue nil
-      
-      
+      val = options[:value] || object.send(name) rescue nil
+
       if val.is_a? BigDecimal
         # if the field appears to be for currency, format it to 2 decimal places.
         if options[:type] == :currency
@@ -78,9 +78,7 @@ module Datanauts
       tabindex = -1 if tabindex === false
       input_options = options.delete(:input_options) || {}
       input_classes = ['form-control'] << input_options.delete(:class)
-      
-      
-      
+
       input_options = {
         :id => input_id,
         :class => input_classes.compact.join(' '),
@@ -92,12 +90,25 @@ module Datanauts
         :style => options.delete(:style),
         :autocomplete => options.delete(:autocomplete)
       }.merge(input_options)
-      
+
+      input_tag_html = :input.tag(input_options)
+
+      if prepend = options.delete(:prepend)
+        prepend = :div.wrap(:class => 'input-group-addon') { prepend }
+      end
+
+      if append = options.delete(:append)
+        append = :div.wrap(:class => 'input-group-addon') { append }
+      end
+
+      if prepend || append
+        input_tag_html = :div.wrap(:class => 'input-group') { prepend.to_s + input_tag_html + append.to_s }
+      end
 
       if options.delete(:no_wrap)
-        :input.tag(input_options)
+        input_tag_html
       else
-        field_for object, name, :input.tag(input_options), options
+        field_for object, name, input_tag_html, options
       end
 
     end
@@ -135,31 +146,44 @@ module Datanauts
         :tabindex => tabindex,
       }.merge(options.delete(:input_options) || {})
 
- 
+
       selected = object.send(name)
       selected = options.delete(:selected) || selected
-      
+
       options[:options] = options[:options].to_a if options[:options].is_a? Hash
 
       unless options[:options].is_a? Array
-        options[:options] = options_for_select(options[:options], { 
+        options[:options] = options_for_select(options[:options], {
           :value_field => options.delete(:options_id),
           :text_field => options.delete(:options_name)
         })
       end
-      
+
       option_attributes = options.delete(:option_attributes) || {}
 
       select_html = :select.wrap(select_options) do
         options_html += options.delete(:options).inject("") do |s, op|
           val, text = op.is_a?(Array) ? [ op[0], op[1] ] : [op, op.humanize]
           option_attr = option_attributes.inject({}) { |h,p| h[p[0]] = p[1][val]; h }
-          s += :option.wrap({ 
-            :value => val, 
+          s += :option.wrap({
+            :value => val,
             :selected => ('selected' if val && selected.to_s == val.to_s)
           }.merge(option_attr)) { text }
-        end.html_safe
+        end
       end
+
+      if prepend = options.delete(:prepend)
+        prepend = :div.wrap(:class => 'input-group-addon') { prepend }
+      end
+
+      if append = options.delete(:append)
+        append = :div.wrap(:class => 'input-group-addon') { append }
+      end
+
+      if prepend || append
+        select_html = :div.wrap(:class => 'input-group') { prepend.to_s + select_html + append.to_s }
+      end
+
 
       if options.delete(:no_wrap)
         select_html
@@ -183,7 +207,7 @@ module Datanauts
         label ||= val
         selected_attr = {}
         selected = options.delete(:selected)
-        
+
         if object.send(name) == val
           selected_attr = {:checked => "checked"}
         elsif object.send(name).nil? && selected == val
@@ -229,16 +253,16 @@ module Datanauts
 
       field_for object, name, checkbox_html, options.merge({:label => false})
     end
-    
+
     def checkbox_group(object, name, options = {})
       checkbox_id = "#{object.class.to_s}_#{name}".underscore
       checkbox_name = "#{object.class.to_s.underscore}[#{name}][]"
 
       div_options = {}.merge(options.delete(:div_options) || {})
       checkbox_options = {}.merge(options.delete(:input_options) || {})
-      
+
       value_options = options.delete(:value_options) || {}
-      
+
       checkboxes_html = :input.tag(:type => "hidden", :name => checkbox_name, :id => "#{checkbox_id}_empty")
 
       checkboxes_html += options.delete(:options).inject("") do |s, op|
@@ -261,7 +285,7 @@ module Datanauts
         elsif object.send(name).nil? && selected == val
           selected_attr = {:checked => "checked"}
         end
-        
+
         value_options[val] = {} unless value_options[val].is_a?(Hash)
 
         s += :div.wrap({:class => "checkbox"}.merge(div_options)) do
@@ -269,8 +293,8 @@ module Datanauts
             :input.tag({:type => "checkbox", :name => checkbox_name, :id => "#{checkbox_id}_#{val}", :value => val }.merge(selected_attr).merge(checkbox_options).merge(value_options[val])) + label
           end
         end
-      end.html_safe
-      
+      end
+
 
       if options.delete(:no_wrap)
         checkboxes_html
@@ -300,7 +324,7 @@ module Datanauts
         :cols => options.delete(:cols),
         :tabindex => tabindex,
       }.merge(options.delete(:input_options) || {})
-      
+
       val = Rack::Utils.escape_html(val) if val.is_a? String
 
       textarea_html = :textarea.wrap(textarea_options) { val }
@@ -330,20 +354,16 @@ module Datanauts
 
       err = (object.errors[name] || nil)
       has_error = !err.nil? && ![*err].empty?
-      
-      option_classes = (options[:class] || "").split(' ') 
+
+      option_classes = (options[:class] || "").split(' ')
       option_classes << 'form-group'
       option_classes << 'required' if required_fields.include?(name)
 
       if options[:label].nil? || options[:label]
 
         label_options = options.delete(:label_options) || {}
-
-        label_classes = (label_options[:class] || "").split(' ')
-        label_classes << 'control-label'
-        label_options[:class] = label_classes.join " "
         label_options[:for] = field_id
-        
+
         if caption = options.delete(:label) || name.to_s.humanize.titleize
           label = :label.wrap(label_options) { caption }
         end
@@ -353,20 +373,20 @@ module Datanauts
       if hint = options.delete(:hint)
         hint = :div.wrap(:class => 'help-block') { hint }
       else
-        hint = "".html_safe
+        hint = ""
       end
 
-      if has_error
-        hint += :div.wrap(:class => "help-block error") { err.join(', ').html_safe }
+      error_message = if has_error
         option_classes << 'has-error'
+        :div.wrap(:class => "help-block error") { err.join(', ') }
       else
-        err = "".html_safe
+        ""
       end
 
-      field_input = input_html + hint.to_s
+      field_input = input_html + hint.to_s + error_message.to_s
 
       options[:class] = option_classes.join(' ')
-      
+
       :div.wrap(options) { label.to_s + field_input }
     end
 

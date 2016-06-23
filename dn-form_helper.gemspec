@@ -6,8 +6,8 @@ require 'datanauts/form_helper/version'
 Gem::Specification.new do |spec|
   spec.name          = "dn-form_helper"
   spec.version       = Datanauts::FormHelper::VERSION
-  spec.authors       = ["Jonathan Davies"]
-  spec.email         = ["jonnie@obdev.co.uk"]
+  spec.authors       = ["Jonathan Davies", "Simon Brook"]
+  spec.email         = ["jonnie@obdev.co.uk", "simon@datanauts.co.uk"]
   spec.summary       = %q{Datanauts form helper}
   spec.description   = %q{}
   spec.homepage      = ""
@@ -20,7 +20,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "rack"
   spec.add_development_dependency "bundler", "~> 1.7"
-  spec.add_development_dependency "activesupport", "~> 3.2.19"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "pry-byebug"
