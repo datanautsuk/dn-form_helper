@@ -338,7 +338,7 @@ module Datanauts
       o.valid?
       required_fields = o.errors.keys
 
-      err = (object.errors[name] || nil)
+      err = object.errors.keys.include?(name) ? object.errors[name] : nil
       has_error = !err.nil? && ![*err].empty?
 
       option_classes = (options[:class] || "").split(' ')
