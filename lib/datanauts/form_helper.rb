@@ -342,7 +342,9 @@ module Datanauts
 
     def submit(object, value = nil, options = {})
       value = object.new? ? 'submit' : 'update' unless value
-      :input.wrap(options.merge(:value => value, :type => 'submit', :class => "btn btn-default"))
+      opts = options.dup.merge(:value => value, :type => 'submit')
+      opts[:class] = 'btn btn-default' unless opts[:class]
+      :input.wrap(opts)
     end
 
     #  =================
