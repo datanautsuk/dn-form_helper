@@ -276,7 +276,7 @@ module Datanauts
       checkbox_html = :input.tag(h) # hidden field input, so we always post a value for the checkbox. 1 if checked, 0 if not.
 
       o = { type: 'checkbox', name: checkbox_name, id: "#{checkbox_id}_true", value: 1 }
-      o.update(checked: 'checked') if (val && !val.to_i.zero?) || options[:checked] == 'checked'
+      o.update(checked: 'checked') if val || options[:checked] == 'checked'
 
       checkbox_html += :label.wrap { :input.tag(o) + (options.delete(:label) || name.to_s.humanize.titleize) }
 
