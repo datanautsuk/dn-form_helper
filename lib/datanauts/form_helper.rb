@@ -230,9 +230,10 @@ module Datanauts
       radio_id = "#{object.class}_#{name}".underscore
       radio_name = "#{object.class.to_s.underscore}[#{name}]"
 
-      radio_options = {}.merge(options.delete(:input_options) || {})
+      wrapper_class = 'radio form-check'
+      wrapper_class << ' form-check-inline' if options.delete(:inline)
 
-      radios_html = options.delete(:options).inject('') do |s, op|
+      radios_html = options.delete(:options).inject('') do |html_string, op|
         val, label = op
         label ||= val
         selected_attr = {}
@@ -244,10 +245,21 @@ module Datanauts
           selected_attr = { checked: 'checked' }
         end
 
-        s += :div.wrap(class: 'radio') do
-          :label.wrap do
-            :input.tag({ type: 'radio', name: radio_name, id: "#{radio_id}_#{val}", value: val }.merge(selected_attr)) + label.to_s
-          end
+        input_radio_id = "#{radio_id}_#{val.to_s.gsub(/\s/, '_')}"
+        input_attrs = {
+          class: 'form-check-input',
+          id: input_radio_id,
+          name: radio_name,
+          type: 'radio',
+          value: val
+        }.merge(selected_attr)
+
+        input_tag = :input.tag(input_attrs)
+        label_tag = :label.wrap(class: 'form-check-label',
+                                for: input_radio_id) { label.to_s }
+
+        html_string + :div.wrap(class: wrapper_class) do
+          input_tag + label_tag
         end
       end
 
@@ -296,16 +308,12 @@ module Datanauts
 
       value_options = options.delete(:value_options) || {}
 
-      checkboxes_html = :input.tag(type: 'hidden', name: checkbox_name, id: "#{checkbox_id}_empty")
+      checkboxes_html = :input.tag(type: 'hidden',
+                                   name: checkbox_name,
+                                   id: "#{checkbox_id}_empty")
 
-      checkboxes_html += options.delete(:options).inject('') do |s, op|
-        if op.is_a? Array
-          val = op[0]
-          label = op[1]
-        else
-          val, label = op
-        end
-
+      checkboxes_html += options.delete(:options).inject('') do |html_string, op|
+        val, label = op
         label ||= val
         selected_attr = {}
         selected = options.delete(:selected)
@@ -318,12 +326,21 @@ module Datanauts
           selected_attr = { checked: 'checked' }
         end
 
-        value_options[val] = {} unless value_options[val].is_a?(Hash)
+        input_checkbox_id = "#{checkbox_id}_#{val.to_s.gsub(/\s/, '_')}"
+        input_attrs = {
+          class: 'form-check-input',
+          id: input_checkbox_id,
+          name: radio_name,
+          type: 'radio',
+          value: val
+        }.merge(selected_attr).merge(checkbox_options).merge(value_options[val])
 
-        s += :div.wrap({ class: 'checkbox' }.merge(div_options)) do
-          :label.wrap do
-            :input.tag({ type: 'checkbox', name: checkbox_name, id: "#{checkbox_id}_#{val}", value: val }.merge(selected_attr).merge(checkbox_options).merge(value_options[val])) + label
-          end
+        input_tag = :input.tag(input_attrs)
+        label_tag = :label.wrap(class: 'form-check-label',
+                                for: input_checkbox_id) { label.to_s }
+
+        html_string + :div.wrap({ class: wrapper_class }.merge(div_options)) do
+          input_tag + label_tag
         end
       end
 
