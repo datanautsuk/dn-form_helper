@@ -439,7 +439,7 @@ module Datanauts
                         ''
                       end
 
-      field_input = input_html + hint.to_s + error_message.to_s
+      field_input = input_html + error_message.to_s + hint.to_s
 
       options[:class] = option_classes.join(' ')
 
