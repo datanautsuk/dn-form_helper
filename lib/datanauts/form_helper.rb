@@ -266,7 +266,10 @@ module Datanauts
       if options.delete(:no_wrap)
         radios_html
       else
-        field_for object, name, radios_html, options
+        field_for object,
+                  name,
+                  radios_html,
+                  options.merge(label_options: { class: 'd-block mb-2' })
       end
     end
 
@@ -347,7 +350,10 @@ module Datanauts
       if options.delete(:no_wrap)
         checkboxes_html
       else
-        field_for object, name, checkboxes_html, options
+        field_for object,
+                  name,
+                  checkboxes_html,
+                  options.merge(label_options: { class: 'd-block mb-2' })
       end
     end
 
