@@ -427,7 +427,7 @@ module Datanauts
       end
 
       hint = if hint = options.delete(:hint)
-               :div.wrap(class: 'help-block') { hint }
+               :div.wrap(class: 'help-block text-muted') { hint }
              else
                ''
              end
@@ -437,7 +437,7 @@ module Datanauts
                         :div.wrap(class: 'help-block error') { err.join(', ') }
                       else
                         ''
-      end
+                      end
 
       field_input = input_html + hint.to_s + error_message.to_s
 
