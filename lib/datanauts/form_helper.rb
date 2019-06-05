@@ -246,7 +246,7 @@ module Datanauts
 
         s += :div.wrap(class: 'radio') do
           :label.wrap do
-            :input.tag({ type: 'radio', name: radio_name, id: "#{radio_id}_#{op[0]}", value: op[0] }.merge(selected_attr)) + label
+            :input.tag({ type: 'radio', name: radio_name, id: "#{radio_id}_#{val}", value: val }.merge(selected_attr)) + label
           end
         end
       end
