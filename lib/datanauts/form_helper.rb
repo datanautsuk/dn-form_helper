@@ -427,7 +427,7 @@ module Datanauts
       end
 
       hint = if hint = options.delete(:hint)
-               :div.wrap(class: 'help-block text-muted') { hint }
+               :small.wrap(class: 'help-block text-muted') { hint }
              else
                ''
              end
