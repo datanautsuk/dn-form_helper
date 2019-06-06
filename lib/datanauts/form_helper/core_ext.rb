@@ -67,3 +67,18 @@ class String
   end
   alias titlecase titleize
 end
+
+# Overrides for Object
+class Object
+  def real_class
+    if respond_to?('__getobj__')
+      __getobj__.class
+    else
+      self.class
+    end
+  end
+
+  def class_name
+    real_class.name
+  end
+end

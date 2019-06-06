@@ -16,7 +16,7 @@ module Datanauts
 
       object, parent_object = [*object]
       prefix = if parent_object
-                 "/#{parent_object.class.to_s.underscore.pluralize}/#{parent_object.id}"
+                 "/#{parent_object.class_name.underscore.pluralize}/#{parent_object.id}"
                else
                  ''
                end
@@ -28,9 +28,9 @@ module Datanauts
 
       if (options[:action].nil? || options[:action] == '') && defined?(request)
         if object.new?
-          opts[:action] = request.script_name.gsub(/\/$/, '') + prefix + "/#{object.class.to_s.underscore}s"
+          opts[:action] = request.script_name.gsub(/\/$/, '') + prefix + "/#{object.class_name.underscore}s"
         else
-          opts[:action] = request.script_name.gsub(/\/$/, '') + prefix + "/#{object.class.to_s.underscore}s/#{object.pk}"
+          opts[:action] = request.script_name.gsub(/\/$/, '') + prefix + "/#{object.class_name.underscore}s/#{object.pk}"
         end
       end
 
@@ -46,8 +46,8 @@ module Datanauts
     def input(object, name, options = {})
       options.symbolize_keys!
 
-      input_id = "#{object.class}_#{name}".underscore
-      input_name = "#{object.class.to_s.underscore}[#{name}]"
+      input_id = "#{object.class_name}_#{name}".underscore
+      input_name = "#{object.class_name.underscore}[#{name}]"
 
       # get object value
       val = if options.key? :value
@@ -158,8 +158,8 @@ module Datanauts
     def select(object, name, options = {})
       options.symbolize_keys!
 
-      select_id = "#{object.class}_#{name}".underscore
-      select_name = "#{object.class.to_s.underscore}[#{name}]"
+      select_id = "#{object.class_name}_#{name}".underscore
+      select_name = "#{object.class_name.underscore}[#{name}]"
 
       options_html = ''
       if prompt = options.delete(:prompt)
@@ -227,8 +227,8 @@ module Datanauts
     def radio_group(object, name, options = {})
       options.symbolize_keys!
 
-      radio_id = "#{object.class}_#{name}".underscore
-      radio_name = "#{object.class.to_s.underscore}[#{name}]"
+      radio_id = "#{object.class_name}_#{name}".underscore
+      radio_name = "#{object.class_name.underscore}[#{name}]"
 
       wrapper_class = 'radio form-check'
       wrapper_class << ' form-check-inline' if options.delete(:inline)
@@ -280,8 +280,8 @@ module Datanauts
     def checkbox(object, name, options = {})
       options.symbolize_keys!
 
-      checkbox_id = "#{object.class}_#{name}".underscore
-      checkbox_name = "#{object.class.to_s.underscore}[#{name}]"
+      checkbox_id = "#{object.class_name}_#{name}".underscore
+      checkbox_name = "#{object.class_name.underscore}[#{name}]"
       val = object.send(name)
 
       tabindex = options.delete(:tab)
@@ -303,8 +303,8 @@ module Datanauts
     def checkbox_group(object, name, options = {})
       options.symbolize_keys!
 
-      checkbox_id = "#{object.class}_#{name}".underscore
-      checkbox_name = "#{object.class.to_s.underscore}[#{name}][]"
+      checkbox_id = "#{object.class_name}_#{name}".underscore
+      checkbox_name = "#{object.class_name.underscore}[#{name}][]"
 
       div_options = {}.merge(options.delete(:div_options) || {})
       checkbox_options = {}.merge(options.delete(:input_options) || {})
@@ -363,8 +363,8 @@ module Datanauts
 
     def textarea(object, name, options = {})
       options.symbolize_keys!
-      textarea_id = "#{object.class}_#{name}".underscore
-      textarea_name = "#{object.class.to_s.underscore}[#{name}]"
+      textarea_id = "#{object.class_name}_#{name}".underscore
+      textarea_name = "#{object.class_name.underscore}[#{name}]"
       val = object.send(name)
 
       tabindex = options.delete(:tab)
@@ -403,8 +403,8 @@ module Datanauts
     #  =================
 
     def field_for(object, name, input_html, options = {})
-      field_id = "#{object.class}_#{name}".underscore
-      o = object.class.new
+      field_id = "#{object.class_name}_#{name}".underscore
+      o = object.real_class.new
       o.valid?
       required_fields = o.errors.keys
 
@@ -426,11 +426,8 @@ module Datanauts
 
       end
 
-      hint = if hint = options.delete(:hint)
-               :small.wrap(class: 'help-block text-muted') { hint }
-             else
-               ''
-             end
+      hint = options.delete(:hint)
+      hint = :small.wrap(class: 'help-block text-muted') { hint } if hint
 
       error_message = if has_error
                         option_classes << 'has-error'
