@@ -99,8 +99,12 @@ module Datanauts
 
       input_tag_html = :input.tag(input_options)
 
-      if prepend = options.delete(:prepend)
-        prepend = :div.wrap(class: 'input-group-addon') { prepend }
+      prepend = options.delete(:prepend)
+
+      if prepend
+        prepend = :div.wrap(class: 'input-group-prepend') do
+          :div.wrap(class: 'input-group-text') { prepend }
+        end
       end
 
       if append = options.delete(:append)
@@ -126,7 +130,8 @@ module Datanauts
         format: options.delete(:format),
         minDate: options.delete(:minDate) || options.delete(:min),
         maxDate: options.delete(:maxDate) || options.delete(:max),
-        defaultDate: options.delete(:defaultDate) || options.delete(:default)
+        defaultDate: options.delete(:defaultDate) || options.delete(:default),
+        provide: 'datepicker'
       }
       datepicker_options.merge!(options.delete(:datepicker_options) || {})
 
@@ -135,9 +140,7 @@ module Datanauts
                          'input-group'].compact.join(' ')
 
       input_options = options.delete(:input_options) || {}
-      input_options[:class] = [input_options[:class], 'datepicker'].compact.join(' ')
-
-      datepicker_options.transform_keys! { |k| "data-#{k}" }
+      datepicker_options.transform_keys! { |k| "data-date-#{k}" }
 
       options[:input_options] = input_options.merge(datepicker_options)
       input object, name, options
