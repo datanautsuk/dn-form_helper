@@ -122,27 +122,22 @@ module Datanauts
       end
     end
 
-    # = f.input :expires_on, class: 'date input-group', input_options: { :class => 'datepicker', :"data-format" => 'MMM D, YYYY' }
-
     def datepicker(object, name, options = {})
       options.symbolize_keys!
       datepicker_options = {
         format: options.delete(:format),
-        minDate: options.delete(:minDate) || options.delete(:min),
-        maxDate: options.delete(:maxDate) || options.delete(:max),
-        defaultDate: options.delete(:defaultDate) || options.delete(:default),
-        provide: 'datepicker'
+        startDate: options.delete(:startDate) || options.delete(:start),
+        endDate: options.delete(:endDate) || options.delete(:end)
       }
       datepicker_options.merge!(options.delete(:datepicker_options) || {})
-
-      options[:class] = [options.delete(:class),
-                         'date',
-                         'input-group'].compact.join(' ')
-
-      input_options = options.delete(:input_options) || {}
       datepicker_options.transform_keys! { |k| "data-date-#{k}" }
-
+      datepicker_options['data-provide'] = 'datepicker'
+      input_options = options.delete(:input_options) || {}
       options[:input_options] = input_options.merge(datepicker_options)
+
+      ruby_format = options.delete(:rformat) || '%d %b %Y'
+      val = object.send(name)
+      options[:value] = val.strftime(ruby_format) unless val.nil?
       input object, name, options
     end
 
