@@ -159,6 +159,9 @@ module Datanauts
       select_id = "#{object.class_name}_#{name}".underscore
       select_name = "#{object.class_name.underscore}[#{name}]"
 
+      multiple = options.delete(:multiple)
+      select_name << '[]' if multiple
+
       options_html = ''
       if prompt = options.delete(:prompt)
         options_html = :option.wrap(value: '') { prompt }
@@ -167,14 +170,18 @@ module Datanauts
       end
 
       tabindex = options.delete(:tab)
-      tabindex = -1 if tabindex === false
+      tabindex = -1 if tabindex == false
+      input_classes = ['form-control'] << options.delete(:class)
+
+      options[:class] = options.delete(:wrapper_class)
 
       select_options = {
         id: select_id,
-        class: 'form-control',
+        class: input_classes.compact.join(' '),
         name: select_name,
-        tabindex: tabindex
-      }.merge(options.delete(:input_options) || {})
+        tabindex: tabindex,
+        multiple: multiple
+      }.compact.merge(options.delete(:input_options) || {})
 
       selected = object.send(name)
       selected = options.delete(:selected) || selected
@@ -189,12 +196,18 @@ module Datanauts
       option_attributes = options.delete(:option_attributes) || {}
 
       select_html = :select.wrap(select_options) do
-        options_html += options.delete(:options).inject('') do |s, op|
+        options_html + options.delete(:options).inject('') do |s, op|
           val, text = op.is_a?(Array) ? [op[0], op[1]] : [op, op.humanize]
           option_attr = option_attributes.each_with_object({}) { |p, h| h[p[0]] = p[1][val]; }
+          is_selected = if selected.is_a?(Array)
+                          'selected' if val && selected.map(&:to_s).include?(val.to_s)
+                        else
+                          'selected' if val && selected.to_s == val.to_s
+                        end
+
           s += :option.wrap({
             value: val,
-            selected: ('selected' if val && selected.to_s == val.to_s)
+            selected: is_selected
           }.merge(option_attr)) { text }
         end
       end
