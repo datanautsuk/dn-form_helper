@@ -244,17 +244,16 @@ module Datanauts
       wrapper_class = 'radio form-check'
       wrapper_class << ' form-check-inline' if options.delete(:inline)
 
+      selected = options.delete(:selected) || object.send(name)
+
       radios_html = options.delete(:options).inject('') do |html_string, op|
         val, label = op
         label ||= val
-        selected_attr = {}
-        selected = options.delete(:selected)
-
-        if object.send(name) == val
-          selected_attr = { checked: 'checked' }
-        elsif object.send(name).nil? && selected == val
-          selected_attr = { checked: 'checked' }
-        end
+        selected_attr = if selected == val
+                          { checked: 'checked' }
+                        else
+                          {}
+                        end
 
         input_radio_id = "#{radio_id}_#{val.to_s.gsub(/\s/, '_')}"
         input_attrs = {
