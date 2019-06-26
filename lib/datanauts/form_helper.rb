@@ -242,7 +242,13 @@ module Datanauts
       radio_name = "#{object.class_name.underscore}[#{name}]"
 
       wrapper_class = 'radio form-check'
-      wrapper_class << ' form-check-inline' if options.delete(:inline)
+      if options.delete(:inline)
+        wrapper_class << ' form-check-inline'
+        options[:hint_class] = [
+          options.delete(:hint_class),
+          'd-block'
+        ].compact.join(' ')
+      end
 
       selected = options.delete(:selected) || object.send(name)
 
@@ -437,7 +443,14 @@ module Datanauts
       end
 
       hint = options.delete(:hint)
-      hint = :small.wrap(class: 'help-block text-muted') { hint } if hint
+      if hint
+        hint_class = [
+          'help-block',
+          'text-muted',
+          options.delete(:hint_class)
+        ].compact.join(' ')
+        hint = :small.wrap(class: hint_class) { hint }
+      end
 
       error_message = if has_error
                         option_classes << 'has-error'
