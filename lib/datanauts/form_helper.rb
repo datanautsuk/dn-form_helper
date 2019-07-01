@@ -474,7 +474,8 @@ module Datanauts
       opts[:value_field] ||= 'id'
       opts[:text_field] ||= 'name'
       begin
-        model.select(opts[:value_field].to_sym, opts[:text_field].to_sym).order(opts[:text_field]).all.inject([]) { |i, p| i << [p.send(opts[:value_field]), p.send(opts[:text_field])] }
+        model.order(opts[:text_field].to_sym)
+             .select_hash(opts[:value_field].to_sym, opts[:text_field].to_sym)
       rescue
         []
       end
