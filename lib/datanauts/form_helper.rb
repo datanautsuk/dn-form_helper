@@ -374,6 +374,15 @@ module Datanauts
                                    name: checkbox_name,
                                    id: "#{checkbox_id}_empty")
 
+      wrapper_class = 'checkbox form-check'
+      if options.delete(:inline)
+        wrapper_class << ' form-check-inline'
+        options[:hint_class] = [
+          options.delete(:hint_class),
+          'd-block'
+        ].compact.join(' ')
+      end
+
       checkboxes_html += options.delete(:options).inject('') do |html_string, op|
         val, label = op
         label ||= val
@@ -392,10 +401,10 @@ module Datanauts
         input_attrs = {
           class: 'form-check-input',
           id: input_checkbox_id,
-          name: radio_name,
-          type: 'radio',
+          name: checkbox_name,
+          type: 'checkbox',
           value: val
-        }.merge(selected_attr).merge(checkbox_options).merge(value_options[val])
+        }.merge(selected_attr).merge(checkbox_options).merge(value_options[val] || {})
 
         input_tag = :input.tag(input_attrs)
         label_tag = :label.wrap(class: 'form-check-label',
