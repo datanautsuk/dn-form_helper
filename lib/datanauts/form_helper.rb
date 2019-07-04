@@ -293,6 +293,20 @@ module Datanauts
     #  = Checkbox =
     #  ============
 
+    # Standard...
+    # <div class="form-check">
+    #   <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+    #   <label class="form-check-label" for="defaultCheck1">
+    #     Default checkbox
+    #   </label>
+    # </div>
+
+    # Switch
+    # <div class="custom-control custom-switch">
+    #   <input type="checkbox" class="custom-control-input" id="customSwitch1">
+    #   <label class="custom-control-label" for="customSwitch1">Toggle this switch element</label>
+    # </div>
+
     def checkbox(object, name, options = {})
       options.symbolize_keys!
 
@@ -301,19 +315,48 @@ module Datanauts
       val = object.send(name)
 
       tabindex = options.delete(:tab)
-      tabindex = -1 if tabindex === false
+      tabindex = -1 if tabindex == false
 
-      h = { type: 'hidden', name: checkbox_name, id: "#{checkbox_id}_false", value: 0, tabindex: tabindex }
-      checkbox_html = :input.tag(h) # hidden field input, so we always post a value for the checkbox. 1 if checked, 0 if not.
+      switch = options.delete(:switch)
 
-      o = { type: 'checkbox', name: checkbox_name, id: "#{checkbox_id}_true", value: 1 }
+      # hidden "false" option...
+      h = {
+        type: 'hidden',
+        name: checkbox_name,
+        id: "#{checkbox_id}_false",
+        value: 0,
+        tabindex: tabindex
+      }
+      checkbox_html = :input.tag(h)
+
+      o = {
+        type: 'checkbox',
+        name: checkbox_name,
+        id: "#{checkbox_id}_true",
+        value: 1,
+        class: switch ? 'custom-control-input' : 'form-check-input'
+      }
       o.update(checked: 'checked') if val || options[:checked] == 'checked'
+      checkbox_html += :input.tag(o)
 
-      checkbox_html += :label.wrap { :input.tag(o) + (options.delete(:label) || name.to_s.humanize.titleize) }
+      # label...
+      l = {
+        for: "#{checkbox_id}_true",
+        class: switch ? 'custom-control-label' : 'form-check-label'
+      }
+      checkbox_html += :label.wrap(l) do
+        options.delete(:label) || name.to_s.humanize.titleize
+      end
 
-      options[:class] ||= 'checkbox'
+      options[:class] ||= 'form-check'
 
       field_for object, name, checkbox_html, options.merge(label: false)
+    end
+
+    def switch(object, name, options = {})
+      options[:class] = 'custom-control custom-switch'
+      options[:switch] = true
+      checkbox object, name, options
     end
 
     def checkbox_group(object, name, options = {})
