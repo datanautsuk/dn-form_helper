@@ -47,14 +47,14 @@ module Datanauts
       options.symbolize_keys!
 
       input_id = "#{object.class_name}_#{name}".underscore
-      input_name = "#{object.class_name.underscore}[#{name}]"
+      input_name = make_name(object, name, options)
 
       # get object value
       val = if options.key? :value
               options[:value]
             else
               begin
-                object.send(name)
+                dn_form_helper_value(object, name)
               rescue
                 nil
               end
@@ -136,7 +136,7 @@ module Datanauts
       options[:input_options] = input_options.merge(datepicker_options)
 
       ruby_format = options.delete(:rformat) || '%d %b %Y'
-      val = object.send(name)
+      val = dn_form_helper_value(object, name)
       options[:value] = val.strftime(ruby_format) unless val.nil?
       input object, name, options
     end
@@ -157,7 +157,7 @@ module Datanauts
       options.symbolize_keys!
 
       select_id = "#{object.class_name}_#{name}".underscore
-      select_name = "#{object.class_name.underscore}[#{name}]"
+      select_name = make_name(object, name, options)
 
       multiple = options.delete(:multiple)
       select_name << '[]' if multiple
@@ -183,7 +183,7 @@ module Datanauts
         multiple: multiple
       }.compact.merge(options.delete(:input_options) || {})
 
-      selected = object.send(name)
+      selected = dn_form_helper_value(object, name)
       selected = options.delete(:selected) || selected
 
       options[:options] = options[:options].to_a if options[:options].is_a? Hash
@@ -239,7 +239,7 @@ module Datanauts
       options.symbolize_keys!
 
       radio_id = "#{object.class_name}_#{name}".underscore
-      radio_name = "#{object.class_name.underscore}[#{name}]"
+      radio_name = make_name(object, name, options)
 
       wrapper_class = 'radio form-check'
       if options.delete(:inline)
@@ -250,7 +250,7 @@ module Datanauts
         ].compact.join(' ')
       end
 
-      selected = options.delete(:selected) || object.send(name)
+      selected = options.delete(:selected) || dn_form_helper_value(object, name)
 
       radios_html = options.delete(:options).inject('') do |html_string, op|
         val, label = op
@@ -311,8 +311,8 @@ module Datanauts
       options.symbolize_keys!
 
       checkbox_id = "#{object.class_name}_#{name}".underscore
-      checkbox_name = "#{object.class_name.underscore}[#{name}]"
-      val = object.send(name)
+      checkbox_name = make_name(object, name, options)
+      val = dn_form_helper_value(object, name)
 
       tabindex = options.delete(:tab)
       tabindex = -1 if tabindex == false
@@ -389,11 +389,11 @@ module Datanauts
         selected_attr = {}
         selected = options.delete(:selected)
 
-        if object.send(name) == val
+        if dn_form_helper_value(object, name) == val
           selected_attr = { checked: 'checked' }
-        elsif object.send(name).is_a?(Array) && object.send(name).include?(val)
+        elsif dn_form_helper_value(object, name).is_a?(Array) && dn_form_helper_value(object, name).include?(val)
           selected_attr = { checked: 'checked' }
-        elsif object.send(name).nil? && selected == val
+        elsif dn_form_helper_value(object, name).nil? && selected == val
           selected_attr = { checked: 'checked' }
         end
 
@@ -432,8 +432,8 @@ module Datanauts
     def textarea(object, name, options = {})
       options.symbolize_keys!
       textarea_id = "#{object.class_name}_#{name}".underscore
-      textarea_name = "#{object.class_name.underscore}[#{name}]"
-      val = object.send(name)
+      textarea_name = make_name(object, name, options)
+      val = dn_form_helper_value(object, name)
 
       tabindex = options.delete(:tab)
       tabindex = -1 if tabindex === false
@@ -484,14 +484,13 @@ module Datanauts
       option_classes << 'required' if required_fields.include?(name)
 
       if options[:label].nil? || options[:label]
-
         label_options = options.delete(:label_options) || {}
         label_options[:for] = field_id
-
-        if caption = options.delete(:label) || name.to_s.humanize.titleize
-          label = :label.wrap(label_options) { caption }
-        end
-
+        caption = (options.delete(:label) || name.to_s.humanize.titleize)
+        label = :label.wrap(label_options) { caption } if caption
+      else
+        options.delete(:label)
+        label = ''
       end
 
       hint = options.delete(:hint)
@@ -533,10 +532,35 @@ module Datanauts
       end
     end
 
+    def make_name(object, name, _options = {})
+      if @dn_current_field_name.present?
+        "#{object.class_name.underscore}[#{@dn_current_field_name}][#{name}]"
+      else
+        "#{object.class_name.underscore}[#{name}]"
+      end
+    end
+
+    def dn_form_helper_value(object, name)
+      if @dn_current_field_name.present?
+        return unless object.send(@dn_current_field_name).is_a?(Hash)
+        object.send(@dn_current_field_name)[name]
+      else
+        object.send(name)
+      end
+    end
+
     class FormModel
       def initialize(context, model_obj)
         @context = context
         @model   = model_obj
+      end
+
+      def fields_for(field_name, namespace = nil)
+        @context.instance_variable_set('@dn_current_field_name', field_name)
+        @context.instance_variable_set('@dn_current_namespace', namespace)
+        yield self
+        @context.instance_variable_set('@dn_current_field_name', nil)
+        @context.instance_variable_set('@dn_current_namespace', nil)
       end
 
       def method_missing(meth, *args)
