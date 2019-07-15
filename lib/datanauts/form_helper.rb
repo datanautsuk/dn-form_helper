@@ -543,7 +543,8 @@ module Datanauts
     def dn_form_helper_value(object, name)
       if @dn_current_field_name.present?
         return unless object.send(@dn_current_field_name).is_a?(Hash)
-        object.send(@dn_current_field_name)[name]
+        object.send(@dn_current_field_name)[name.to_s] ||
+          object.send(@dn_current_field_name)[name]
       else
         object.send(name)
       end
