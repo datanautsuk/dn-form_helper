@@ -94,7 +94,8 @@ module Datanauts
         placeholder: options.delete(:placeholder),
         value: val,
         style: options.delete(:style),
-        autocomplete: options.delete(:autocomplete)
+        autocomplete: options.delete(:autocomplete),
+        required: options.delete(:required)
       }.merge(input_options)
 
       input_tag_html = :input.tag(input_options)
