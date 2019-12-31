@@ -336,7 +336,8 @@ module Datanauts
         id: "#{checkbox_id}_true",
         value: 1,
         class: switch ? 'custom-control-input' : 'form-check-input'
-      }
+      }.merge(options.delete(:input_options) || {})
+
       o.update(checked: 'checked') if val || options[:checked] == 'checked'
       checkbox_html += :input.tag(o)
 
