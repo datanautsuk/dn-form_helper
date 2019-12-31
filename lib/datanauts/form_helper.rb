@@ -325,7 +325,7 @@ module Datanauts
         type: 'hidden',
         name: checkbox_name,
         id: "#{checkbox_id}_false",
-        value: 0,
+        value: '0',
         tabindex: tabindex
       }
       checkbox_html = :input.tag(h)
