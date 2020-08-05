@@ -28,9 +28,9 @@ module Datanauts
 
       if (options[:action].nil? || options[:action] == '') && defined?(request)
         if object.new?
-          opts[:action] = request.script_name.gsub(/\/$/, '') + prefix + "/#{object.class_name.underscore}s"
+          opts[:action] = request.script_name.gsub(/\/$/, '') + prefix + "/#{object.class_name.underscore.pluralize}"
         else
-          opts[:action] = request.script_name.gsub(/\/$/, '') + prefix + "/#{object.class_name.underscore}s/#{object.pk}"
+          opts[:action] = request.script_name.gsub(/\/$/, '') + prefix + "/#{object.class_name.underscore.pluralize}/#{object.pk}"
         end
       end
 
