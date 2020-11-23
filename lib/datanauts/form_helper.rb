@@ -512,7 +512,7 @@ module Datanauts
 
       error_message = if has_error
                         option_classes << 'has-error'
-                        :div.wrap(class: 'help-block error invalid-feedback') { err.join(', ') }
+                        :div.wrap(class: 'invalid-feedback') { err.join(', ') }
                       else
                         ''
                       end
