@@ -485,7 +485,10 @@ module Datanauts
 
       option_classes = (options[:class] || '').split(' ')
       option_classes << 'form-group'
-      option_classes << 'required' if required_fields.include?(name)
+      if required_fields.include?(name)
+        option_classes << 'required'
+        options[:required] = true
+      end
 
       if options[:label].nil? || options[:label]
         label_options = options.delete(:label_options) || {}
