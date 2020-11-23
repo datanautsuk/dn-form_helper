@@ -30,11 +30,13 @@ module Datanauts
         if object.new?
           opts[:action] = request.script_name.gsub(/\/$/, '') + prefix + "/#{object.class_name.underscore.pluralize}"
         else
-          opts[:action] = request.script_name.gsub(/\/$/, '') + prefix + "/#{object.class_name.underscore.pluralize}/#{object.pk}"
-        end
+          opts[:action] = request.script_name.gsub(/\/$/, '') + prefix + "/#{object.class_name.underscore.pluralize}/#{object.pk}"        end
       end
 
       options[:enctype] = 'multipart/form-data' if options.delete(:file)
+      css_class = options.delete(:class) || ''
+      css_class = "was-validated #{css_class}".strip if object.respond_to?(:errors) && !object.errors.empty?
+      options[:class] = css_class
 
       :form.wrap(opts.merge(options)) { mfield + csrf_field + capture_haml(FormModel.new(self, object), &block) }
     end
