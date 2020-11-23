@@ -86,6 +86,7 @@ module Datanauts
       tabindex = -1 if tabindex == false
       input_options = options.delete(:input_options) || {}
       input_classes = ['form-control'] << input_options.delete(:class)
+      input_classes << 'is-invalid' if object.errors.key?(name)
 
       input_options = {
         id: input_id,
@@ -476,19 +477,13 @@ module Datanauts
 
     def field_for(object, name, input_html, options = {})
       field_id = "#{object.class_name}_#{name}".underscore
-      o = object.real_class.new
-      o.valid?
-      required_fields = o.errors.keys
 
       err = object.errors.keys.include?(name) ? object.errors[name] : nil
       has_error = !err.nil? && ![*err].empty?
 
       option_classes = (options[:class] || '').split(' ')
       option_classes << 'form-group'
-      if required_fields.include?(name)
-        option_classes << 'required'
-        options[:required] = true
-      end
+      option_classes << 'required' if object.dn_required_fields.include?(name)
 
       if options[:label].nil? || options[:label]
         label_options = options.delete(:label_options) || {}
@@ -562,7 +557,7 @@ module Datanauts
         @context = context
         @model   = model_obj
         @model.class.class_eval { attr_accessor :dn_required_fields }
-        dummy_object = @model.class.new
+        dummy_object = @model.real_class.new
         dummy_object.valid?
         @model.dn_required_fields = dummy_object.errors.keys
       end
