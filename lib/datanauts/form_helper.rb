@@ -97,7 +97,7 @@ module Datanauts
         value: val,
         style: options.delete(:style),
         autocomplete: options.delete(:autocomplete),
-        required: options.delete(:required)
+        required: options.delete(:required) || object.dn_required_fields.include?(name.to_sym)
       }.merge(input_options)
 
       input_tag_html = :input.tag(input_options)
@@ -561,6 +561,10 @@ module Datanauts
       def initialize(context, model_obj)
         @context = context
         @model   = model_obj
+        @model.class.class_eval { attr_accessor :dn_required_fields }
+        dummy_object = @model.class.new
+        dummy_object.valid?
+        @model.dn_required_fields = dummy_object.errors.keys
       end
 
       def fields_for(field_name, namespace = nil)
