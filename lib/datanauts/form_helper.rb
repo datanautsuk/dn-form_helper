@@ -112,7 +112,7 @@ module Datanauts
       end
 
       if append = options.delete(:append)
-        append = :div.wrap(class: 'input-group-addon') { append }
+        append = :div.wrap(class: 'input-group-append') { append }
       end
 
       if prepend || append
@@ -514,7 +514,7 @@ module Datanauts
 
       field_input = input_html + error_message.to_s + hint.to_s
 
-      options[:class] = option_classes.join(' ')
+options[:class] = option_classes.join(' ')
 
       :div.wrap(options) { label.to_s + field_input }
     end
