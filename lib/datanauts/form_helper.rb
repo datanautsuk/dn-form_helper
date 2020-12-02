@@ -112,7 +112,9 @@ module Datanauts
       end
 
       if append = options.delete(:append)
-        append = :div.wrap(class: 'input-group-append') { append }
+        append = :div.wrap(class: 'input-group-append') do
+          :div.wrap(class: 'input-group-text') { append }
+        end
       end
 
       if prepend || append
