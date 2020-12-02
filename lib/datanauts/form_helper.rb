@@ -118,7 +118,8 @@ module Datanauts
       end
 
       if prepend || append
-        input_tag_html = :div.wrap(class: 'input-group') { prepend.to_s + input_tag_html + append.to_s }
+        input_group_class = ['input-group', options.delete(:input_group_class)].compact.join(' ')
+        input_tag_html = :div.wrap(class: input_group_class) { prepend.to_s + input_tag_html + append.to_s }
       end
 
       if options.delete(:no_wrap)
