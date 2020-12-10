@@ -70,9 +70,7 @@ module Datanauts
       end
 
       def input_options_from_options
-        return {} unless options[:input_options].is_a?(Hash)
-
-        @input_options_from_options ||= options.delete(:input_options)
+        @input_options_from_options ||= options.delete(:input_options) || {}
       end
     end
   end
