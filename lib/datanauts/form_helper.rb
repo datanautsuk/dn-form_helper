@@ -4,21 +4,15 @@ require 'bigdecimal'
 require 'rack/utils'
 
 module Datanauts
-  # The main module
+  # ==========================================
+  # = helper to generate html form for model
+  # ==========================================
   module FormHelper
-    # ==========================================
-    # = helper to generate html form for model
-    # =
-    # ==========================================
     def form_for(object, options = {}, &block)
       raise ArgumentError, 'Missing block' unless block_given?
 
       FormForPresenter.new(self, object, options.symbolize_keys, &block).to_html
     end
-
-    # =========
-    # = Input =
-    # =========
 
     def input(object, name, options = {})
       InputPresenter.new(object, name, options.symbolize_keys).to_html
@@ -28,27 +22,15 @@ module Datanauts
       DatePickerPresenter.new(object, name, options.symbolize_keys).to_html
     end
 
-    #  ==========
-    #  = Hidden =
-    #  ==========
-
     def hidden(object, name, options = {})
       InputPresenter.new(object,
                          name,
                          options.symbolize_keys.merge(type: 'hidden')).to_html
     end
 
-    #  ==========
-    #  = Select =
-    #  ==========
-
     def select(object, name, options = {})
       SelectPresenter.new(object, name, options.symbolize_keys).to_html
     end
-
-    #  =========
-    #  = Radio =
-    #  =========
 
     def radio_group(object, name, options = {})
       RadioGroupPresenter.new(object, name, options.symbolize_keys).to_html
@@ -68,47 +50,20 @@ module Datanauts
       CheckboxGroupPresenter.new(object, name, options.symbolize_keys).to_html
     end
 
-    #  ============
-    #  = Textarea =
-    #  ============
-
     def textarea(object, name, options = {})
       TextAreaPresenter.new(object, name, options.symbolize_keys).to_html
     end
 
-    # =================
-    # = Submit button =
-    # =================
-
     def submit(object, value = nil, options = {})
       options.symbolize_keys!
+      if value.is_a?(Hash)
+        options = value
+        value = nil
+      end
       value ||= object.new? ? 'submit' : 'update'
       opts = options.dup.merge(value: value, type: 'submit')
-      opts[:class] = 'btn btn-default' unless opts[:class]
+      opts[:class] = 'btn btn-success' unless opts[:class]
       :input.tag(opts)
-    end
-
-    #  =================
-    #  = Field wrapper =
-    #  =================
-
-    def field_for(object, name, input_html, options = {})
-      FieldPresenter.new(object, name, input_html, options).to_html
-    end
-
-    #  ====================================
-    #  = Option tags nested within Select =
-    #  ====================================
-
-    def options_for_select(model, opts = {})
-      opts[:value_field] ||= 'id'
-      opts[:text_field] ||= 'name'
-      begin
-        model.order(opts[:text_field].to_sym)
-             .select_hash(opts[:value_field].to_sym, opts[:text_field].to_sym)
-      rescue StandardError
-        []
-      end
     end
 
     # Dummy class to hold the object and pass back to caller
@@ -140,9 +95,5 @@ module Datanauts
         @context.respond_to?(meth) || super
       end
     end
-
-    # ==========================
-    # = helpers for helpers :) =
-    # ==========================
   end
 end
