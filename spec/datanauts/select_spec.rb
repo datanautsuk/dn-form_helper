@@ -1,104 +1,150 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
+# rubocop:disable Metrics/BlockLength
 describe 'Datanauts::FormHelper#select' do
-  before do
-    @user = User.new(:first_name => 'Jo', :last_name => 'Blogs', :select_thing => nil)
+  let(:user) do
+    User.new(first_name: 'Jo', last_name: 'Blogs', select_thing: nil)
   end
-  
+
+  let(:form) { Datanauts::FormHelper::FormModel.new(self, user) }
+
   context 'with no options' do
     it 'returns a select tag with a default prompt' do
-      f = select(@user, :select_thing)
-      expect(f.chomp).to eql '<div class="form-group"><label for="user_select_thing">Select Thing</label>
-<select id="user_select_thing" class="form-control" name="user[select_thing]"><option value="">Choose</option>
-</select>
-</div>'.no_white_space
+      f = form.select(:select_thing)
+
+      expect(f.chomp).to eql <<-INPUT.no_white_space.strip
+        <div class="form-group">
+          <label for="user_select_thing">Select Thing</label>
+          <select name="user[select_thing]" id="user_select_thing" class="form-control">
+            <option value="">choose...</option>
+          </select>
+        </div>
+      INPUT
     end
-    
+
     it 'returns a select without an option' do
-      f = select(@user, :select_thing, :prompt => false)
-      expect(f.chomp).to eql '<div class="form-group"><label for="user_select_thing">Select Thing</label>
-<select id="user_select_thing" class="form-control" name="user[select_thing]"></select>
-</div>'.no_white_space
+      f = form.select(:select_thing, prompt: false)
+      expect(f.chomp).to eql <<-INPUT.no_white_space.strip
+        <div class="form-group">
+          <label for="user_select_thing">Select Thing</label>
+          <select name="user[select_thing]" id="user_select_thing" class="form-control"></select>
+        </div>
+      INPUT
     end
-    
+
     it 'returns a select tag with a user defined prompt' do
-      f = select(@user, :select_thing, :prompt => "Hello!")
-      expect(f.chomp).to eql '<div class="form-group"><label for="user_select_thing">Select Thing</label>
-<select id="user_select_thing" class="form-control" name="user[select_thing]"><option value="">Hello!</option>
-</select>
-</div>'.no_white_space
+      f = form.select(:select_thing, prompt: 'Hello!')
+      expect(f.chomp).to eql <<-INPUT.no_white_space.strip
+        <div class="form-group">
+          <label for="user_select_thing">Select Thing</label>
+          <select name="user[select_thing]" id="user_select_thing" class="form-control">
+            <option value="">Hello!</option>
+          </select>
+        </div>
+      INPUT
     end
-    
   end
-  
+
   context 'with some options' do
     it 'has some options' do
-      f = select(@user, :select_thing, :options => %w(foo bar baz))
-      expect(f.chomp).to eql '<div class="form-group"><label for="user_select_thing">Select Thing</label>
-<select id="user_select_thing" class="form-control" name="user[select_thing]"><option value="">Choose</option>
-<option value="foo">Foo</option>
-<option value="bar">Bar</option>
-<option value="baz">Baz</option>
-</select>
-</div>'.no_white_space
+      f = form.select(:select_thing, options: %w[foo bar baz])
+
+      expect(f.chomp).to eql <<-INPUT.no_white_space.strip
+        <div class="form-group">
+          <label for="user_select_thing">Select Thing</label>
+          <select name="user[select_thing]" id="user_select_thing" class="form-control">
+            <option value="">choose...</option>
+            <option value="foo">Foo</option>
+            <option value="bar">Bar</option>
+            <option value="baz">Baz</option>
+          </select>
+        </div>
+      INPUT
     end
-    
+
     it 'has some options with values' do
-      f = select(@user, :select_thing, :options => {:foo => "one", :bar => "two", :baz => "three"})
-      expect(f.chomp).to eql '<div class="form-group"><label for="user_select_thing">Select Thing</label>
-<select id="user_select_thing" class="form-control" name="user[select_thing]"><option value="">Choose</option>
-<option value="foo">one</option>
-<option value="bar">two</option>
-<option value="baz">three</option>
-</select>
-</div>'.no_white_space
+      f = form.select(:select_thing,
+                      options: { foo: 'one', bar: 'two', baz: 'three' })
+
+      expect(f.chomp).to eql <<-INPUT.no_white_space.strip
+        <div class="form-group">
+          <label for="user_select_thing">Select Thing</label>
+          <select name="user[select_thing]" id="user_select_thing" class="form-control">
+            <option value="">choose...</option>
+            <option value="foo">one</option>
+            <option value="bar">two</option>
+            <option value="baz">three</option>
+          </select>
+        </div>
+      INPUT
     end
-    
+
     it 'adds the selected attribute to the correct option tag' do
-      allow(@user).to receive(:select_thing) { 'bar' }
-      f = select(@user, :select_thing, :options => {:foo => "one", :bar => "two", :baz => "three"})
-      expect(f.chomp).to eql '<div class="form-group"><label for="user_select_thing">Select Thing</label>
-<select id="user_select_thing" class="form-control" name="user[select_thing]"><option value="">Choose</option>
-<option value="foo">one</option>
-<option value="bar" selected="selected">two</option>
-<option value="baz">three</option>
-</select>
-</div>'.no_white_space
+      allow(user).to receive(:select_thing) { 'bar' }
+      f = form.select(:select_thing, options: { foo: 'one', bar: 'two', baz: 'three' })
+
+      expect(f.chomp).to eql <<-INPUT.no_white_space.strip
+        <div class="form-group">
+          <label for="user_select_thing">Select Thing</label>
+          <select name="user[select_thing]" id="user_select_thing" class="form-control">
+            <option value="">choose...</option>
+            <option value="foo">one</option>
+            <option value="bar" selected>two</option>
+            <option value="baz">three</option>
+          </select>
+        </div>
+      INPUT
     end
   end
-  
-    context 'with addons' do
 
+  context 'with addons' do
     it 'adds addon to the beginning of the input' do
+      f = form.select(:select_thing,
+                      prepend: '£',
+                      options: { foo: 'one', bar: 'two', baz: 'three' })
 
-     f = select(@user, :select_thing, :prepend => '£', :options => {:foo => "one", :bar => "two", :baz => "three"})
-
-      expect(f.chomp).to eql '<div class="form-group"><label for="user_select_thing">Select Thing</label>
-<div class="input-group"><div class="input-group-addon">£</div><select id="user_select_thing" class="form-control" name="user[select_thing]"><option value="">Choose</option>
-<option value="foo">one</option>
-<option value="bar">two</option>
-<option value="baz">three</option>
-</select></div>
-</div>'.no_white_space
-
+      expect(f.chomp).to eql <<-INPUT.no_white_space.strip
+        <div class="form-group">
+          <label for="user_select_thing">Select Thing</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <div class="input-group-text">£</div>
+            </div>
+            <select name="user[select_thing]" id="user_select_thing" class="form-control">
+              <option value="">choose...</option>
+              <option value="foo">one</option>
+              <option value="bar">two</option>
+              <option value="baz">three</option>
+            </select>
+          </div>
+        </div>
+      INPUT
     end
 
     it 'adds addon to the end of the input' do
+      f = form.select(:select_thing,
+                      append: '.00',
+                      options: { foo: 'one', bar: 'two', baz: 'three' })
 
-     f = select(@user, :select_thing, :append => '.00', :options => {:foo => "one", :bar => "two", :baz => "three"})
-
-     expect(f.chomp).to eql '<div class="form-group"><label for="user_select_thing">Select Thing</label>
-<div class="input-group"><select id="user_select_thing" class="form-control" name="user[select_thing]"><option value="">Choose</option>
-<option value="foo">one</option>
-<option value="bar">two</option>
-<option value="baz">three</option>
-</select><div class="input-group-addon">.00</div></div>
-</div>'.no_white_space
-
+      expect(f.chomp).to eql <<-INPUT.no_white_space.strip
+        <div class="form-group">
+          <label for="user_select_thing">Select Thing</label>
+          <div class="input-group">
+            <select name="user[select_thing]" id="user_select_thing" class="form-control">
+              <option value="">choose...</option>
+              <option value="foo">one</option>
+              <option value="bar">two</option>
+              <option value="baz">three</option>
+            </select>
+            <div class="input-group-append">
+              <div class="input-group-text">.00</div>
+            </div>
+          </div>
+        </div>
+      INPUT
     end
-
-
-      end
-
-  
+  end
 end
+# rubocop:enable Metrics/BlockLength
