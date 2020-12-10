@@ -102,7 +102,9 @@ module Datanauts
       end
 
       def value_to_use
-        @value_to_use ||= options.delete(:value) || current_value
+        @value_to_use ||= options.delete(:value) ||
+                          input_options_from_options.delete(:value) ||
+                          current_value
       end
 
       def other_input_options
