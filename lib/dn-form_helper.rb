@@ -1,1 +1,15 @@
+# frozen_string_literal: true
+
 require 'datanauts/form_helper'
+require 'datanauts/form_helper/version'
+require 'datanauts/form_helper/core_ext'
+require 'datanauts/form_helper/form_for_presenter'
+require 'datanauts/form_helper/base_presenter'
+require 'datanauts/form_helper/field_presenter'
+require 'datanauts/form_helper/input_presenter'
+require 'datanauts/form_helper/select_presenter'
+require 'datanauts/form_helper/text_area_presenter'
+require 'datanauts/form_helper/date_picker_presenter'
+require 'datanauts/form_helper/checkbox_presenter'
+require 'datanauts/form_helper/checkbox_group_presenter'
+require 'datanauts/form_helper/radio_group_presenter'
