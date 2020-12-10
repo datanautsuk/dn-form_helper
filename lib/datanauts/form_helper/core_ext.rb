@@ -1,9 +1,13 @@
+# frozen_string_literal: true
+
+require 'sequel/extensions/inflector'
+require 'sequel/extensions/blank'
+
 # Patches to allow easy(ish) html outpus
 class Symbol
   # :input.tag :name => 'address', :value => 'Foo Road'
   def tag(options = {})
-    option_string = (' ' + options.to_html_options).sub(/\s+$/, '')
-    "<#{self}#{option_string} />"
+    "<#{self} #{options.to_html_options} />"
   end
 
   # :div.wrap "Hello", :id => "userbox", :class => "box"
@@ -12,29 +16,35 @@ class Symbol
   # If you give a content as block and as parameter too, then the parameter
   # will be the default value (in case of the block is empty)
   def wrap(content = nil, options = {}, &block)
-    (options = content; content = nil) if content.is_a? Hash
+    if content.is_a? Hash
+      options = content
+      content = nil
+    end
+
     content = yield || content if block
-    option_string = (' ' + options.to_html_options).sub(/\s+$/, '')
-    "<#{self}#{option_string}>#{content}</#{self}>"
+    "<#{self} #{options.to_html_options}>#{content}</#{self}>"
   end
 end
 
 # Useful extensions to hash class
 class Hash
   def to_html_options
-    (map { |key, value| %(#{key}="#{value}") if value } - [nil]).join(' ')
+    compact.map do |k, v|
+      v == true ? k.to_s : %(#{k}="#{v.to_s.tr('"', '%22')}")
+    end.join ' '
   end
 
   def symbolize_keys
-    transform_keys { |key| key.to_sym rescue key }
+    transform_keys(&:to_sym)
   end
 
   def symbolize_keys!
-    transform_keys! { |key| key.to_sym rescue key }
+    transform_keys!(&:to_sym)
   end
 
   def transform_keys
     return enum_for(:transform_keys) unless block_given?
+
     result = self.class.new
     each_key do |key|
       result[yield(key)] = self[key]
@@ -44,28 +54,12 @@ class Hash
 
   def transform_keys!
     return enum_for(:transform_keys!) unless block_given?
+
     keys.each do |key|
       self[yield(key)] = delete(key)
     end
     self
   end
-end
-
-# useful patches to string...
-class String
-  def underscore
-    gsub(/::/, '/').gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
-                   .gsub(/([a-z\d])([A-Z])/, '\1_\2').tr('-', '_').downcase
-  end
-
-  def humanize
-    gsub(/_id$/, '').tr('_', ' ').capitalize
-  end
-
-  def titleize
-    underscore.humanize.gsub(/\b([a-z])/) { |x| x[-1..-1].upcase }
-  end
-  alias titlecase titleize
 end
 
 # Overrides for Object
@@ -80,5 +74,9 @@ class Object
 
   def class_name
     real_class.name
+  end
+
+  def present?
+    !blank?
   end
 end
