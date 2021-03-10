@@ -86,7 +86,13 @@ module Datanauts
 
       def remaining_opts
         options[:label] = false
-        { class: 'form-check', only_class: true }.merge(options)
+        wrapper_div_options.merge(options)
+      end
+
+      def wrapper_div_options
+        return { class: 'form-check', only_class: true } unless switch?
+
+        { class: 'custom-control custom-switch', only_class: true }
       end
     end
   end
