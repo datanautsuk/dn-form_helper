@@ -43,6 +43,7 @@ module Datanauts
     def switch(object, name, options = {})
       options[:class] = 'custom-control custom-switch'
       options[:switch] = true
+      options[:hint_class] = 'd-block my-2'
       checkbox object, name, options
     end
 
