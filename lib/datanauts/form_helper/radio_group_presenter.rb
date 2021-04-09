@@ -27,20 +27,35 @@ module Datanauts
           wrapper_class: wrapper_class,
           name: input_name,
           id_stem: field_id,
-          selected: options.delete(:selected)
+          selected: options.delete(:selected),
+          custom: custom?
         }
       end
 
       def wrapper_class
+        return custom_wrapper_class if custom?
+
         ['form-check', inline_class].compact.join ' '
       end
 
-      def inline_class
-        'form-check-inline' if inline?
+      def custom?
+        @custom ||= options.delete(:custom)
+      end
+
+      def custom_wrapper_class
+        ['custom-control', 'custom-radio', custom_inline_class].compact.join ' '
+      end
+
+      def custom_inline_class
+        'custom-control-inline' if inline?
       end
 
       def inline?
         @inline ||= options.delete(:inline)
+      end
+
+      def inline_class
+        'form-check-inline' if inline?
       end
 
       def remaining_opts
@@ -57,7 +72,7 @@ module Datanauts
       def hint_class
         return unless inline?
 
-        [options.delete(:hint_class), 'd-block'].compact.join(' ')
+        [options.delete(:hint_class), 'd-block', 'my-2'].compact.join(' ')
       end
     end
 
@@ -86,13 +101,23 @@ module Datanauts
 
       def input_attrs
         {
-          class: 'form-check-input',
+          class: input_class,
           id: radio_id,
           name: options[:name],
           type: 'radio',
           value: option_value,
           checked: checked
         }.merge(radio_options).merge(value_options)
+      end
+
+      def input_class
+        return 'custom-control-input' if custom?
+
+        'form-check-input'
+      end
+
+      def custom?
+        options[:custom]
       end
 
       def radio_id

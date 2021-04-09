@@ -42,20 +42,35 @@ module Datanauts
           id_stem: field_id,
           selected: options.delete(:selected),
           checkbox_options: (options.delete(:input_options) || {}),
-          value_options: (options.delete(:value_options) || {})
+          value_options: (options.delete(:value_options) || {}),
+          custom: custom?
         }
       end
 
       def wrapper_class
+        return custom_wrapper_class if custom?
+
         ['form-check', inline_class].compact.join ' '
       end
 
-      def inline_class
-        'form-check-inline' if inline?
+      def custom?
+        @custom ||= options.delete(:custom)
+      end
+
+      def custom_wrapper_class
+        ['custom-control', 'custom-checkbox', custom_inline_class].compact.join ' '
+      end
+
+      def custom_inline_class
+        'custom-control-inline' if inline?
       end
 
       def inline?
         @inline ||= options.delete(:inline)
+      end
+
+      def inline_class
+        'form-check-inline' if inline?
       end
 
       def remaining_opts
@@ -72,7 +87,7 @@ module Datanauts
       def hint_class
         return unless inline?
 
-        [options.delete(:hint_class), 'd-block'].compact.join(' ')
+        [options.delete(:hint_class), 'd-block', 'my-2'].compact.join(' ')
       end
     end
 
@@ -109,13 +124,23 @@ module Datanauts
 
       def input_attrs
         {
-          class: 'form-check-input',
+          class: input_class,
           id: checkbox_id,
           name: options[:name],
           type: 'checkbox',
           value: option_value,
           checked: checked
         }.merge(checkbox_options).merge(value_options)
+      end
+
+      def input_class
+        return 'custom-control-input' if custom?
+
+        'form-check-input'
+      end
+
+      def custom?
+        options[:custom]
       end
 
       def checkbox_id
