@@ -1,6 +1,6 @@
 # Datanauts::FormHelper
 
-TODO: Write a gem description
+This is a form helper (very much inspired by SimpleForm) for use with Sinatra and Sequel
 
 ## Installation
 

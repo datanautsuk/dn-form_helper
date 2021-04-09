@@ -72,7 +72,8 @@ module Datanauts
           class: input_class,
           type: input_type,
           name: input_name,
-          value: input_value
+          value: input_value,
+          required: required?
         }.merge(other_input_options).compact
       end
 

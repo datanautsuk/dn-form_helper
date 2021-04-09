@@ -25,7 +25,8 @@ module Datanauts
           name: input_name,
           rows: options.delete(:rows),
           cols: options.delete(:cols),
-          tabindex: tabindex
+          tabindex: tabindex,
+          required: required?
         }.merge(other_options)
       end
 

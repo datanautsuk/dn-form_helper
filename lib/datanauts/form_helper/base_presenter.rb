@@ -72,6 +72,14 @@ module Datanauts
       def input_options_from_options
         @input_options_from_options ||= options.delete(:input_options) || {}
       end
+
+      def required?
+        options.delete(:required) || required_by_validation?
+      end
+
+      def required_by_validation?
+        true if object.dn_required_fields.include?(name.to_sym)
+      end
     end
   end
 end
