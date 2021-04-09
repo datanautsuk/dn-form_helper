@@ -111,9 +111,13 @@ module Datanauts
       end
 
       def input_class
-        return 'custom-control-input' if custom?
+        [class_stem, 'input'].join '-'
+      end
 
-        'form-check-input'
+      def class_stem
+        return 'custom-control' if custom?
+
+        'form-check'
       end
 
       def custom?
@@ -165,7 +169,7 @@ module Datanauts
 
       def label_attrs
         {
-          class: 'form-check-label',
+          class: "#{class_stem}-label",
           for: radio_id
         }
       end
