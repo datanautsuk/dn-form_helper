@@ -92,7 +92,7 @@ module Datanauts
           type: 'radio',
           value: option_value,
           checked: checked
-        }.merge(checkbox_options).merge(value_options)
+        }.merge(radio_options).merge(value_options)
       end
 
       def radio_id
@@ -111,6 +111,23 @@ module Datanauts
         options[:selected] || actual_value
       end
 
+      def radio_options
+        return {} unless possible_options.is_a?(Hash)
+
+        possible_options
+      end
+
+      def possible_options
+        options[:radio_options] || options[:input_options]
+      end
+
+      def value_options
+        return {} unless options[:value_options].is_a?(Hash)
+        return {} unless options[:value_options][option_value].is_a?(Hash)
+
+        options[:value_options][option_value]
+      end
+
       def label_tag
         :label.wrap(label_attrs) { label_text }
       end
@@ -122,5 +139,59 @@ module Datanauts
         }
       end
     end
+  end
+end
+
+def radio_group(object, name, options = {})
+  options.symbolize_keys!
+
+  radio_id = "#{object.class_name}_#{name}".underscore
+  radio_name = make_name(object, name, options)
+
+  wrapper_class = 'radio form-check'
+  if options.delete(:inline)
+    wrapper_class << ' form-check-inline'
+    options[:hint_class] = [
+      options.delete(:hint_class),
+      'd-block'
+    ].compact.join(' ')
+  end
+
+  selected = options.delete(:selected) || dn_form_helper_value(object, name)
+
+  radios_html = options.delete(:options).inject('') do |html_string, op|
+    val, label = op
+    label ||= val
+    selected_attr = if selected == val
+                      { checked: 'checked' }
+                    else
+                      {}
+                    end
+
+    input_radio_id = "#{radio_id}_#{val.to_s.gsub(/\s/, '_')}"
+    input_attrs = {
+      class: 'form-check-input',
+      id: input_radio_id,
+      name: radio_name,
+      type: 'radio',
+      value: val
+    }.merge(selected_attr)
+
+    input_tag = :input.tag(input_attrs)
+    label_tag = :label.wrap(class: 'form-check-label',
+                            for: input_radio_id) { label.to_s }
+
+    html_string + :div.wrap(class: wrapper_class) do
+      input_tag + label_tag
+    end
+  end
+
+  if options.delete(:no_wrap)
+    radios_html
+  else
+    field_for object,
+              name,
+              radios_html,
+              options.merge(label_options: { class: 'd-block mb-2' })
   end
 end

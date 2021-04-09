@@ -147,9 +147,13 @@ module Datanauts
       end
 
       def checkbox_options
-        return {} unless options[:checkbox_options].is_a?(Hash)
+        return {} unless possible_options.is_a?(Hash)
 
-        options[:checkbox_options]
+        possible_options
+      end
+
+      def possible_options
+        options[:checkbox_options] || options[:input_options]
       end
 
       def value_options
