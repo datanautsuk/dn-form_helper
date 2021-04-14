@@ -15,7 +15,7 @@ module Datanauts
       end
 
       def empty_checkbox
-        return unless empty_checkbox?
+        return '' unless empty_checkbox?
 
         :input.tag(type: 'hidden', name: checkbox_name, id: "#{field_id}_empty")
       end
