@@ -56,11 +56,11 @@ module Datanauts
     end
 
     def submit(object, value = nil, options = {})
-      options.symbolize_keys!
       if value.is_a?(Hash)
         options = value
         value = nil
       end
+      options.symbolize_keys!
       value ||= object.new? ? 'submit' : 'update'
       opts = options.dup.merge(value: value, type: 'submit')
       opts[:class] = 'btn btn-success' unless opts[:class]
