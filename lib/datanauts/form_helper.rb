@@ -18,6 +18,10 @@ module Datanauts
       InputPresenter.new(object, name, options.symbolize_keys).to_html
     end
 
+    def file_input(object, name, options = {})
+      FileInputPresenter.new(object, name, options.symbolize_keys).to_html
+    end
+
     def datepicker(object, name, options = {})
       DatePickerPresenter.new(object, name, options.symbolize_keys).to_html
     end
@@ -94,6 +98,14 @@ module Datanauts
 
       def respond_to_missing?(meth, *args)
         @context.respond_to?(meth) || super
+      end
+    end
+
+    class << self
+      attr_accessor :file_input_name_proc
+
+      def configure
+        yield self
       end
     end
   end
