@@ -147,9 +147,7 @@ module Datanauts
       end
 
       def group_options_from_table
-        options.delete(:options)
-               .select(value_field.to_sym, text_field.to_sym, group.to_sym)
-               .all
+        options.delete(:options).all
       rescue StandardError
         []
       end
