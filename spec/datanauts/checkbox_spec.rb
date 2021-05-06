@@ -12,6 +12,9 @@ describe 'Datanauts::FormHelper#checkbox' do
              super: false)
   end
   let(:form) { Datanauts::FormHelper::FormModel.new(self, user) }
+  let(:prefs) do
+    { foo: 'Some Foo', bar: 'Some Bar', baz: 'Some Baz', fiz: 'Some Fizz' }
+  end
 
   context 'checkbox' do
     it 'renders a checkbox with a true value' do
@@ -38,8 +41,7 @@ describe 'Datanauts::FormHelper#checkbox' do
     end
 
     it 'renders a group of checkboxes with some options checked' do
-      prefs = { foo: 'Some Foo', bar: 'Some Bar', baz: 'Some Baz', fiz: 'Some Fizz' }
-      f = form.checkbox_group(:preferences, options: prefs)
+      f = form.checkbox_group(:preferences, options: prefs, include_blank: true)
 
       expect(f.no_white_space).to eql <<-INPUT.no_white_space.strip
         <div class="form-group"><label class="d-block mb-2" for="user_preferences">Preferences</label>
