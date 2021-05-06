@@ -2,8 +2,8 @@
 
 module Datanauts
   module FormHelper
-    # rubocop:disable Metrics/ClassLength
     # Class to present <select> element
+    # rubocop:disable Metrics/ClassLength
     class SelectPresenter < BasePresenter
       def to_html
         FieldPresenter.new(object, name, select_html, remaining_opts).to_html
@@ -109,7 +109,45 @@ module Datanauts
       end
 
       def options_html
+        return grouped_options_html if group?
+
         presented_options.map(&:to_html).join ''
+      end
+
+      def group?
+        group.present?
+      end
+
+      def group
+        @group ||= options.delete(:group)
+      end
+
+      def grouped_options_html
+        grouped_options.map do |group_name, group_options|
+          OptionGroupPresenter.new(group_name,
+                                   value_field.to_sym,
+                                   text_field.to_sym,
+                                   current_value,
+                                   group_options).to_html
+        end.join ''
+      end
+
+      def grouped_options
+        grouped_options_from_options.group_by { |opt| opt[group.to_sym] }
+      end
+
+      def grouped_options_from_options
+        return options.delete(:options) if options[:options].is_a?(Array)
+
+        group_options_from_table
+      end
+
+      def group_options_from_table
+        options.delete(:options)
+               .select(value_field.to_sym, text_field.to_sym, group.to_sym)
+               .naked.all
+      rescue StandardError
+        []
       end
 
       def presented_options
@@ -175,6 +213,42 @@ module Datanauts
         ]
       end
     end
+    # rubocop:enable Metrics/ClassLength
+
+    # class to present <optgroup> tags
+    class OptionGroupPresenter
+      attr_accessor :name, :val_meth, :lbl_meth, :actual_value, :options
+
+      def initialize(name, val_meth, lbl_meth, actual_value, options)
+        @name = name
+        @val_meth = val_meth
+        @lbl_meth = lbl_meth
+        @actual_value = actual_value
+        @options = options
+      end
+
+      def to_html
+        :optgroup.wrap(label: name) { options_html }
+      end
+
+      private
+
+      def options_html
+        presented_options.map(&:to_html).join('')
+      end
+
+      def presented_options
+        options.map do |option|
+          OptionPresenter.new(value_and_label(option), actual_value)
+        end
+      end
+
+      def value_and_label(opt)
+        val = opt.respond_to?(val_meth) ? opt.send(val_meth) : opt[val_meth]
+        label = opt.respond_to?(lbl_meth) ? opt.send(lbl_meth) : opt[lbl_meth]
+        [val, label]
+      end
+    end
 
     # class to present <option> tags
     class OptionPresenter
@@ -210,4 +284,3 @@ module Datanauts
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
