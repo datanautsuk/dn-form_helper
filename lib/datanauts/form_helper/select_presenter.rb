@@ -133,19 +133,23 @@ module Datanauts
       end
 
       def grouped_options
-        grouped_options_from_options.group_by { |opt| opt[group.to_sym] }
+        grouped_options_from_options.group_by { |opt| opt.send(group.to_sym) }
       end
 
       def grouped_options_from_options
-        return options.delete(:options) if options[:options].is_a?(Array)
+        return group_options_from_array if options[:options].is_a?(Array)
 
         group_options_from_table
+      end
+
+      def group_options_from_array
+        options.delete(:options).map { |data| OpenStruct.new(data) }
       end
 
       def group_options_from_table
         options.delete(:options)
                .select(value_field.to_sym, text_field.to_sym, group.to_sym)
-               .naked.all
+               .all
       rescue StandardError
         []
       end
