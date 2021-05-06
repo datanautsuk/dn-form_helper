@@ -146,5 +146,35 @@ describe 'Datanauts::FormHelper#select' do
       INPUT
     end
   end
+
+  context 'by group' do
+    let(:grouped_options) do
+      [
+        { id: 1, name: 'foo', group: 'one' },
+        { id: 2, name: 'bar', group: 'one' },
+        { id: 3, name: 'baz', group: 'two' }
+      ].map { |h| OpenStruct.new(h) }
+    end
+
+    it 'has some options with values' do
+      f = form.select(:select_thing, options: grouped_options, group: :group)
+
+      expect(f.chomp).to eql <<-INPUT.no_white_space.strip
+        <div class="form-group">
+          <label for="user_select_thing">Select Thing</label>
+          <select name="user[select_thing]" id="user_select_thing" class="form-control">
+            <option value="">choose...</option>
+            <optgroup label="one">
+              <option value="1">foo</option>
+              <option value="2">bar</option>
+            </optgroup>
+            <optgroup label="two">
+              <option value="3">baz</option>
+            </optgroup>
+          </select>
+        </div>
+      INPUT
+    end
+  end
 end
 # rubocop:enable Metrics/BlockLength
