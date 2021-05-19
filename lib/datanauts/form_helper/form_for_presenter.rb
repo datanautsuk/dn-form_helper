@@ -24,7 +24,7 @@ module Datanauts
       end
 
       def method_field
-        return '' if object.new?
+        return '' if object.new? || options[:method].to_s.downcase == 'post'
 
         :input.tag(type: 'hidden', name: '_method', value: 'put')
       end
