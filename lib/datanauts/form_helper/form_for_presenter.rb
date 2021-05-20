@@ -25,8 +25,13 @@ module Datanauts
 
       def method_field
         return '' if object.new?
+        return '' if explicit_post_request?
 
         :input.tag(type: 'hidden', name: '_method', value: 'put')
+      end
+
+      def explicit_post_request?
+        options[:method].to_s.downcase == 'post'
       end
 
       def csrf_field
