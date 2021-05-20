@@ -47,5 +47,17 @@ describe 'Datanauts::FormHelper#form_for' do
       FORM
     end
   end
+
+  context 'with method override' do
+    it 'returns the right thing' do
+      f = form_for(@user, method: 'POST') { '<p>abc def</p>' }
+
+      expect(f.no_white_space).to match <<-FORM.no_white_space.strip
+        <form method="POST" action="/admin/users/1" class="form was-validated">
+          <p>abc def</p>
+        </form>
+      FORM
+    end
+  end
 end
 # rubocop:enable Metrics/BlockLength
