@@ -31,7 +31,13 @@ module Datanauts
       end
 
       def singular_object_name
-        object.class_name.underscore
+        name_from_table || object.class_name.underscore
+      end
+
+      def name_from_table
+        return unless object.class.respond_to?(:table_name)
+
+        object.class.table_name.to_s.singularize
       end
 
       def bracketed_field_prefix
