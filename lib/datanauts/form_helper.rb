@@ -17,6 +17,7 @@ module Datanauts
     def input(object, name, options = {})
       InputPresenter.new(object, name, options.symbolize_keys).to_html
     end
+    alias text input
 
     def file_input(object, name, options = {})
       FileInputPresenter.new(object, name, options.symbolize_keys).to_html
