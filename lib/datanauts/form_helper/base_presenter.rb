@@ -54,6 +54,12 @@ module Datanauts
         "[#{name}]"
       end
 
+      def value_to_use
+        @value_to_use ||= options.delete(:value) ||
+                          input_options_from_options.delete(:value) ||
+                          current_value
+      end
+
       def current_value
         if object.dn_current_field_name.present?
           current_value_from_hash

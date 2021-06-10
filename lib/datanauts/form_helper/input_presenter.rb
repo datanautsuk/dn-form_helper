@@ -102,12 +102,6 @@ module Datanauts
         value_to_use.map { |v| Rack::Utils.escape_html(v) }.join ','
       end
 
-      def value_to_use
-        @value_to_use ||= options.delete(:value) ||
-                          input_options_from_options.delete(:value) ||
-                          current_value
-      end
-
       def other_input_options
         {
           tabindex: tabindex,

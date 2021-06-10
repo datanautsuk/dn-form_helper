@@ -17,7 +17,7 @@ module Datanauts
       def presented_radios
         options.delete(:options).map do |option_value|
           RadioOptionPresenter.new(option_value,
-                                   current_value,
+                                   value_to_use,
                                    option_presenter_options)
         end
       end
