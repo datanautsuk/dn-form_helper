@@ -31,7 +31,11 @@ module Datanauts
       end
 
       def singular_object_name
-        name_from_table || object.class_name.underscore
+        name_from_options || name_from_table || object.class_name.underscore
+      end
+
+      def name_from_options
+        @name_from_options ||= options.delete(:object_name)
       end
 
       def name_from_table
