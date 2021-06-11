@@ -74,27 +74,27 @@ module Datanauts
       end
 
       def derived_action
-        script_base + prefix + resources_path + resource_path
+        [script_base, prefix, resources_path, resource_path].compact.join '/'
       end
 
       def script_base
-        context.request.script_name.gsub(/\/$/, '')
+        context.request.script_name.gsub(%r{/$}, '')
       end
 
       def prefix
-        return '' unless parent.present?
+        return unless parent.present?
 
-        "/#{parent.class_name.tableize}/#{parent.id}"
+        "#{parent.class_name.tableize}/#{parent.id}"
       end
 
       def resources_path
-        "/#{object.class_name.tableize}"
+        return object.class.table_name if object.class.respond_to?(:table_name)
+
+        object.class_name.tableize
       end
 
       def resource_path
-        return '' if object.new?
-
-        "/#{object.pk}"
+        object.pk
       end
 
       def enctype
