@@ -64,7 +64,7 @@ module Datanauts
         if object.dn_current_field_name.present?
           current_value_from_hash
         else
-          object.send(name)
+          @current_value ||= object.send(name)
         end
       end
 
