@@ -90,10 +90,16 @@ module Datanauts
       end
 
       def required?
-        options.delete(:required) || required_by_validation?
+        if options.key?(:required)
+          # we only want to return true (or nil)
+          true if options.delete(:required)
+        else
+          required_by_validation?
+        end
       end
 
       def required_by_validation?
+        # we only want to return true (or nil)
         true if object.dn_required_fields.include?(name.to_sym)
       end
     end
