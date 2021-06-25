@@ -54,21 +54,12 @@ module Datanauts
       def other_input_options
         {
           tabindex: tabindex,
-          autocomplete: autocomplete,
-          required: (true if required)
+          autocomplete: autocomplete
         }.merge(input_options_from_options)
       end
 
       def autocomplete
         options.delete(:autocomplete)
-      end
-
-      def required
-        options.delete(:required) || required_by_validation?
-      end
-
-      def required_by_validation?
-        object.dn_required_fields.include?(name.to_sym)
       end
 
       def input_classes

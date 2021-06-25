@@ -108,7 +108,6 @@ module Datanauts
           placeholder: placeholder,
           style: style,
           autocomplete: autocomplete,
-          required: (true if required)
         }.merge(input_options_from_options)
       end
 
@@ -122,14 +121,6 @@ module Datanauts
 
       def autocomplete
         options.delete(:autocomplete)
-      end
-
-      def required
-        options.delete(:required) || required_by_validation?
-      end
-
-      def required_by_validation?
-        object.dn_required_fields.include?(name.to_sym)
       end
 
       def input_classes
