@@ -281,7 +281,7 @@ module Datanauts
       end
 
       def in_array?
-        true if actual_value.map(&:to_s).include?(option_value)
+        true if actual_value.map(&:to_s).include?(option_value.to_s)
       end
     end
   end

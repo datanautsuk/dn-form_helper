@@ -2,6 +2,6 @@
 
 module Datanauts
   module FormHelper
-    VERSION = '1.2.8'
+    VERSION = '1.2.9'
   end
 end
