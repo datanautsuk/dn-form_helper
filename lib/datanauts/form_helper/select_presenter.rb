@@ -154,7 +154,7 @@ module Datanauts
 
       def presented_options
         select_options.map do |option_value|
-          OptionPresenter.new(option_value, current_value)
+          OptionPresenter.new(option_value, option_presenter_options)
         end
       end
 
@@ -256,10 +256,10 @@ module Datanauts
     class OptionPresenter
       attr_accessor :option_value, :actual_value, :label_text
 
-      def initialize(option_value, actual_value)
+      def initialize(option_value, params)
         @option_value, @label_text = option_value
         @label_text ||= option_value.humanize
-        @actual_value = actual_value
+        @actual_value = params[:selected]
       end
 
       def to_html
