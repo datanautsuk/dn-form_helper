@@ -28,7 +28,8 @@ module Datanauts
           name: input_name,
           id_stem: field_id,
           selected: options.delete(:selected),
-          custom: custom?
+          custom: custom?,
+          value_options: (options.delete(:value_options) || {})
         }
       end
 
