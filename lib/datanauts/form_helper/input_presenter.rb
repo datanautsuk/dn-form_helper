@@ -73,6 +73,7 @@ module Datanauts
           type: input_type,
           name: input_name,
           value: input_value,
+          size: size,
           required: required?
         }.merge(other_input_options).compact
       end
@@ -98,6 +99,10 @@ module Datanauts
         end
       end
 
+      def size
+        options.delete(:size)
+      end
+
       def safe_joined_array_vals
         value_to_use.map { |v| Rack::Utils.escape_html(v) }.join ','
       end
@@ -107,7 +112,7 @@ module Datanauts
           tabindex: tabindex,
           placeholder: placeholder,
           style: style,
-          autocomplete: autocomplete,
+          autocomplete: autocomplete
         }.merge(input_options_from_options)
       end
 
