@@ -55,9 +55,30 @@ module Datanauts
       end
 
       def value_to_use
-        @value_to_use ||= options.delete(:value) ||
-                          input_options_from_options.delete(:value) ||
-                          current_value
+        return supplied_value unless value_map?
+
+        value_map[supplied_value]
+      end
+
+      def value_map?
+        value_map.present?
+      end
+
+      def value_map
+        return { true => '1', false => '0' } if boolean?
+
+        @value_map ||= options.delete(:value_map) ||
+                       options.delete(:mapped_values)
+      end
+
+      def boolean?
+        @boolean ||= options.delete(:boolean)
+      end
+
+      def supplied_value
+        @supplied_value ||= options.delete(:value) ||
+                            input_options_from_options.delete(:value) ||
+                            current_value
       end
 
       def current_value
