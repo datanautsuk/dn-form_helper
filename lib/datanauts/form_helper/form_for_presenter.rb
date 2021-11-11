@@ -45,6 +45,8 @@ module Datanauts
       def csrf_value
         return unless context.session
 
+        Rack::Protection::AuthenticityToken.token(session)
+      rescue StandardError
         context.session[:csrf]
       end
 
