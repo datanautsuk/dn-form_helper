@@ -11,7 +11,7 @@ module Datanauts
           options[:no_wrap] = true
         end
 
-        options[:type] = 'password' if name =~ /password/
+        options[:type] = 'password' if name =~ /^password/
 
         FieldPresenter.new(object, name, input_html, options).to_html
       end
